@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>LAZIZZE — DJ</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter+Tight:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --pk: #FF007F;
+      --bk: #000000;
+      --b: 3px solid var(--bk);
+      --m: 'Space Mono', monospace;
+      --t: 'Inter Tight', sans-serif;
+    }
+
+    html { height: 100%; }
+    body { min-height: 100%; background: var(--pk); color: var(--bk); font-family: var(--t); overflow-x: hidden; }
+
+    .page { display: none; }
+    .page.active { display: flex; flex-direction: column; }
+
+    /* HALFTONE IMAGE */
+    .halftone { position: relative; overflow: hidden; }
+    .halftone img {
+      width: 100%; height: 100%; object-fit: cover; display: block;
+      filter: grayscale(100%) contrast(1.5) brightness(0.85);
+      mix-blend-mode: multiply;
+    }
+    .halftone::after {
+      content: ''; position: absolute; inset: 0; pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.4'/%3E%3C/svg%3E");
+      mix-blend-mode: overlay; opacity: 0.6;
+    }
+
+    /* HOME */
+    #page-home { height: 100dvh; position: relative; overflow: hidden; }
+    #page-home.active { display: grid; grid-template-rows: auto 22dvh 1fr auto; }
+
+    .home-name { padding: 1vw 3vw 0; }
+    .home-name h1 {
+      font-family: var(--t); font-weight: 900;
+      font-size: clamp(4.5rem, 18vw, 16rem);
+      line-height: 0.88; letter-spacing: -0.12em;
+      text-transform: uppercase;
+    }
+
+    .home-photo { min-height: 0; }
+
+    .home-nav { display: flex; flex-direction: column; justify-content: flex-end; padding: 0 3vw 1vw; }
+    .home-nav a {
+      display: block; text-decoration: none; color: var(--bk);
+      font-family: var(--t); font-weight: 900;
+      font-size: clamp(4rem, 16vw, 14rem);
+      line-height: 1.0; letter-spacing: -0.04em;
+      text-transform: uppercase;
+      transition: opacity 0.12s ease;
+    }
+    .home-nav a:hover { opacity: 0.5; }
+    .home-nav a:focus-visible { outline: 3px solid var(--bk); outline-offset: 2px; }
+    .home-nav a:active { opacity: 0.3; }
+
+    .home-footer {
+      display: grid; grid-template-columns: 1fr 1fr 1fr 1fr;
+      padding: 10px 3vw; border-top: var(--b);
+    }
+    .home-footer span {
+      font-family: var(--m); font-weight: 700;
+      font-size: clamp(0.45rem, 0.9vw, 0.75rem);
+      text-transform: uppercase; letter-spacing: 0.06em;
+    }
+    .home-footer span:last-child { text-align: right; }
+
+    /* BOTTOM NAV */
+    .bottom-nav {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
+      background: var(--pk); border-top: var(--b);
+    }
+    .nav-links { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; }
+    .nav-links a {
+      display: flex; align-items: center; justify-content: center;
+      padding: 14px 0; text-decoration: none;
+      font-family: var(--t); font-weight: 900;
+      font-size: clamp(0.75rem, 2vw, 1.2rem);
+      text-transform: uppercase; letter-spacing: 0.02em;
+      color: var(--bk); border-right: var(--b);
+      transition: opacity 0.12s ease;
+    }
+    .nav-links a:last-child { border-right: none; }
+    .nav-links a:hover { opacity: 0.6; }
+    .nav-links a:focus-visible { outline: 3px solid var(--bk); outline-offset: -3px; }
+    .nav-links a.active { background: var(--pk); color: var(--bk); }
+    .nav-footer {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 5px 3vw; border-top: var(--b);
+    }
+    .nav-footer span {
+      font-family: var(--m); font-weight: 400;
+      font-size: 0.45rem; text-transform: uppercase;
+      letter-spacing: 0.1em; opacity: 0.4;
+    }
+
+    /* INNER PAGE SHELL */
+    .inner-shell { min-height: 100dvh; display: flex; flex-direction: column; background: var(--pk); }
+    .inner-content { flex: 1; overflow-y: auto; display: flex; flex-direction: column; padding-bottom: 70px; }
+
+    /* PAGE TITLE */
+    .pg-title { padding: 1vw 3vw 0; }
+    .pg-title h1 {
+      font-family: var(--t); font-weight: 900;
+      font-size: clamp(3.5rem, 16vw, 14rem);
+      line-height: 0.88; letter-spacing: -0.04em;
+      text-transform: uppercase;
+    }
+
+    /* ABOUT */
+    .marquee-strip {
+      overflow: hidden; white-space: nowrap;
+      background: var(--bk); padding: 8px 0;
+      border-top: var(--b); border-bottom: var(--b);
+    }
+    .marquee-inner { display: inline-block; animation: marquee 50s linear infinite; }
+    .marquee-inner span {
+      font-family: var(--m); font-weight: 700;
+      font-size: clamp(0.55rem, 0.9vw, 0.75rem);
+      color: var(--pk); letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+    @keyframes marquee {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-33.33%); }
+    }
+
+    .about-bio-main { padding: 4vw 3vw; border-bottom: var(--b); }
+    .about-bio-main p {
+      font-family: var(--t); font-weight: 900;
+      font-size: clamp(1.3rem, 3.8vw, 3.2rem);
+      line-height: 1.05; letter-spacing: -0.03em;
+      text-transform: uppercase;
+    }
+
+    .about-photo { height: clamp(120px, 20vw, 220px); }
+
+    .about-bottom { display: grid; grid-template-columns: 1fr 1fr; flex: 1; }
+    .about-bottom-left { padding: 4vw 3vw; border-right: var(--b); }
+    .about-bottom-left p {
+      font-family: var(--t); font-weight: 900;
+      font-size: clamp(0.8rem, 1.3vw, 1rem);
+      line-height: 1.3; text-transform: uppercase; opacity: 0.75;
+    }
+    .about-details { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; }
+    .about-detail { padding: 4px 16px; }
+    .about-detail-lbl {
+      display: block; font-family: var(--m); font-weight: 700;
+      font-size: 0.5rem; text-transform: uppercase;
+      letter-spacing: 0.15em; opacity: 0.4;
+    }
+    .about-detail-val {
+      display: block; margin-top: 4px;
+      font-family: var(--t); font-weight: 900;
+      font-size: clamp(0.85rem, 1.5vw, 1.15rem);
+      text-transform: uppercase; letter-spacing: -0.02em;
+    }
+
+    .about-socials {
+      display: grid; grid-template-columns: 1fr 1fr 1fr;
+      border-top: var(--b); border-bottom: var(--b);
+    }
+    .about-social {
+      display: flex; align-items: center; justify-content: center;
+      padding: 14px 8px; text-decoration: none; color: var(--bk);
+      font-family: var(--m); font-weight: 700;
+      font-size: clamp(0.55rem, 1vw, 0.8rem);
+      text-transform: uppercase; letter-spacing: 0.15em;
+      border-right: var(--b);
+      transition: opacity 0.12s ease;
+    }
+    .about-social:last-child { border-right: none; }
+    .about-social:hover { opacity: 0.6; }
+    .about-social:focus-visible { outline: 3px solid var(--bk); outline-offset: -3px; }
+    .about-social:active { opacity: 0.3; }
+
+    #page-about .inner-content { padding-bottom: 70px; }
+
+    /* SOUNDS */
+    .sounds-sub { padding: 8px 3vw; background: var(--bk); border-bottom: var(--b); }
+    .sounds-sub span {
+      font-family: var(--m); font-weight: 700;
+      font-size: clamp(0.45rem, 0.8vw, 0.65rem);
+      color: var(--pk); text-transform: uppercase; letter-spacing: 0.22em;
+    }
+
+    .trk { border-bottom: var(--b); cursor: pointer; transition: background 0.12s ease; }
+    .trk:hover { opacity: 0.85; }
+    .trk.playing { background: var(--bk); }
+    .trk-inner { display: flex; align-items: center; gap: 10px; padding: 10px 3vw; }
+    .trk-play {
+      width: 24px; height: 24px; flex-shrink: 0;
+      border: 3px solid var(--bk); display: flex;
+      align-items: center; justify-content: center;
+      font-size: 0.5rem; font-weight: 900;
+    }
+    .trk.playing .trk-play { border-color: var(--pk); color: var(--pk); }
+    .trk-name {
+      flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+      font-family: var(--t); font-weight: 900;
+      font-size: clamp(1rem, 2.5vw, 1.6rem);
+      text-transform: uppercase; letter-spacing: -0.02em; line-height: 1;
+    }
+    .trk.playing .trk-name { color: var(--pk); }
+    .trk-meta {
+      flex-shrink: 0; font-family: var(--m); font-weight: 700;
+      font-size: clamp(0.4rem, 0.7vw, 0.55rem);
+      text-transform: uppercase; opacity: 0.5; letter-spacing: 0.08em;
+    }
+    .trk.playing .trk-meta { color: var(--pk); }
+    .trk-progress { padding: 0 2vw 8px; }
+    .trk-pbar { height: 3px; background: rgba(255,0,127,0.2); }
+    .trk-pfill { height: 100%; background: var(--pk); transition: width 0.3s ease; }
+
+    .photo-break { height: clamp(100px, 22vw, 240px); border-bottom: var(--b); }
+
+    .sounds-cta { padding: 14px 2vw; background: var(--bk); text-align: center; }
+    .sounds-cta span {
+      font-family: var(--m); font-weight: 700;
+      font-size: clamp(0.5rem, 1vw, 0.8rem);
+      color: var(--pk); text-transform: uppercase; letter-spacing: 0.2em;
+    }
+
+    /* PRESSKIT */
+    .pk-head {
+      display: flex; align-items: flex-end; justify-content: space-between;
+      padding: 0.5vw 2vw 0;
+    }
+    .pk-head h1 {
+      font-family: var(--t); font-weight: 900;
+      font-size: clamp(3rem, 14vw, 12rem);
+      line-height: 0.88; letter-spacing: -0.04em;
+      text-transform: uppercase;
+    }
+    .pk-lang { display: flex; gap: 4px; margin-bottom: 8px; }
+    .pk-lang button {
+      font-family: var(--m); font-weight: 700; cursor: pointer;
+      font-size: clamp(0.5rem, 0.8vw, 0.65rem);
+      text-transform: uppercase; letter-spacing: 0.08em;
+      padding: 4px 10px; border: 3px solid var(--bk);
+      background: transparent; color: var(--bk);
+      transition: opacity 0.12s ease;
+    }
+    .pk-lang button:hover { opacity: 0.7; }
+    .pk-lang button:focus-visible { outline: 3px solid var(--bk); outline-offset: -3px; }
+    .pk-lang button.active { background: var(--bk); color: var(--pk); }
+
+    .pk-sub {
+      padding: 8px 2vw; background: var(--bk);
+      border-top: var(--b); border-bottom: var(--b);
+    }
+    .pk-sub span {
+      font-family: var(--m); font-weight: 700;
+      font-size: clamp(0.45rem, 0.8vw, 0.6rem);
+      color: var(--pk); text-transform: uppercase; letter-spacing: 0.22em;
+    }
+
+    .pk-body { flex: 1; display: grid; grid-template-columns: 1fr 1fr; }
+    .pk-left { border-right: var(--b); display: flex; flex-direction: column; }
+
+    .pk-lbl {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 6px 3vw; border-bottom: var(--b);
+    }
+    .pk-lbl span {
+      font-family: var(--m); font-weight: 700;
+      font-size: clamp(0.45rem, 0.7vw, 0.55rem);
+      text-transform: uppercase; letter-spacing: 0.18em; opacity: 0.5;
+    }
+    .pk-lbl-btn {
+      font-family: var(--m); font-weight: 700; cursor: pointer;
+      font-size: clamp(0.4rem, 0.65vw, 0.5rem);
+      text-transform: uppercase; letter-spacing: 0.1em;
+      padding: 2px 10px; border: 3px solid var(--bk);
+      background: var(--bk); color: var(--pk);
+      transition: opacity 0.12s ease;
+    }
+    .pk-lbl-btn:hover { opacity: 0.7; }
+
+    .pk-photos {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      border-bottom: var(--b); min-height: 200px;
+    }
+    .pk-photo-cell { position: relative; overflow: hidden; cursor: pointer; border-right: var(--b); }
+    .pk-photo-cell:last-child { border-right: none; }
+    .pk-photo-ov {
+      position: absolute; inset: 0; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      background: rgba(0,0,0,0.75); opacity: 0;
+      transition: opacity 0.2s ease; z-index: 2;
+    }
+    .pk-photo-cell:hover .pk-photo-ov { opacity: 1; }
+    .pk-photo-ov span {
+      font-family: var(--m); font-weight: 700;
+      font-size: 0.45rem; color: var(--pk);
+      text-transform: uppercase; letter-spacing: 0.1em;
+    }
+    .pk-photo-ov button {
+      margin-top: 6px; font-family: var(--m); font-weight: 700; cursor: pointer;
+      font-size: 0.4rem; color: var(--bk); background: var(--pk);
+      border: none; padding: 3px 8px; text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .pk-photo-ov button:hover { opacity: 0.8; }
+
+    .pk-see {
+      display: flex; align-items: center; justify-content: center;
+      padding: 8px; border-bottom: var(--b); cursor: pointer;
+      transition: opacity 0.12s ease;
+    }
+    .pk-see:hover { opacity: 0.6; }
+    .pk-see span {
+      font-family: var(--m); font-weight: 700;
+      font-size: clamp(0.5rem, 0.8vw, 0.65rem);
+      text-transform: uppercase; letter-spacing: 0.15em;
+    }
+
+    .pk-vid { border-bottom: var(--b); }
+    .pk-vid-hd {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 2vw; cursor: pointer;
+      transition: background 0.12s ease;
+    }
+    .pk-vid-hd:hover { opacity: 0.85; }
+    .pk-vid-hd.active { background: var(--bk); }
+    .pk-vid-left { display: flex; align-items: center; gap: 8px; min-width: 0; }
+    .pk-vid-ico {
+      flex-shrink: 0; font-size: 0.6rem; font-weight: 900; width: 16px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .pk-vid-hd.active .pk-vid-ico { color: var(--pk); }
+    .pk-vid-nm {
+      font-family: var(--t); font-weight: 900;
+      font-size: clamp(0.65rem, 1.2vw, 0.85rem);
+      text-transform: uppercase; letter-spacing: -0.01em;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .pk-vid-hd.active .pk-vid-nm { color: var(--pk); }
+    .pk-vid-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+    .pk-vid-dur {
+      font-family: var(--m); font-weight: 700;
+      font-size: 0.45rem; opacity: 0.45;
+      text-transform: uppercase; letter-spacing: 0.08em;
+    }
+    .pk-vid-hd.active .pk-vid-dur { color: var(--pk); }
+    .pk-vid-tag {
+      font-family: var(--m); font-weight: 700;
+      font-size: 0.4rem; padding: 2px 6px;
+      text-transform: uppercase; letter-spacing: 0.08em;
+      color: var(--pk); background: var(--bk);
+      transition: background 0.12s ease, color 0.12s ease;
+    }
+    .pk-vid-hd.active .pk-vid-tag { color: var(--bk); background: var(--pk); }
+
+    .pk-vid-player { background: var(--bk); }
+    .pk-vid-embed {
+      position: relative; width: 100%; aspect-ratio: 16/9;
+      border-top: 3px solid var(--pk); border-bottom: 3px solid var(--pk);
+    }
+    .pk-vid-embed iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: none; }
+    .pk-vid-ctrl { display: flex; align-items: stretch; border-bottom: 3px solid var(--pk); }
+    .pk-vid-btn {
+      display: flex; align-items: center; justify-content: center; gap: 4px;
+      padding: 8px 12px; cursor: pointer; background: transparent; border: none;
+      min-width: 50px; transition: opacity 0.12s ease;
+    }
+    .pk-vid-btn span { font-weight: 900; color: var(--pk); }
+    .pk-vid-btn .arr { font-size: 1rem; }
+    .pk-vid-btn .lbl { font-size: 0.4rem; letter-spacing: 0.08em; }
+    .pk-vid-btn.disabled { opacity: 0.2; pointer-events: none; }
+    .pk-vid-mid {
+      flex: 1; display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 12px;
+      border-left: 3px solid var(--pk); border-right: 3px solid var(--pk);
+    }
+    .pk-vid-idx {
+      font-family: var(--m); font-weight: 700;
+      font-size: 0.45rem; color: var(--pk);
+      letter-spacing: 0.1em; opacity: 0.6;
+    }
+    .pk-vid-open {
+      font-family: var(--m); font-weight: 700; cursor: pointer;
+      font-size: 0.4rem; color: var(--bk); background: var(--pk);
+      border: none; padding: 3px 8px; text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .pk-vid-open:hover { opacity: 0.8; }
+
+    .pk-right { display: flex; flex-direction: column; }
+
+    .pk-bio { flex: 1; padding: 2vw; border-bottom: var(--b); }
+    .pk-bio p {
+      font-family: var(--t); font-weight: 900;
+      font-size: clamp(0.75rem, 1.4vw, 1.05rem);
+      line-height: 1.3; letter-spacing: -0.01em;
+      text-transform: uppercase;
+    }
+
+    .pk-info { display: grid; grid-template-columns: 1fr 1fr; border-bottom: var(--b); }
+    .pk-info-cell { padding: 12px 16px; }
+    .pk-info-lbl {
+      display: block; font-family: var(--m); font-weight: 700;
+      font-size: 0.5rem; text-transform: uppercase;
+      letter-spacing: 0.15em; opacity: 0.4;
+    }
+    .pk-info-val {
+      display: block; margin-top: 4px;
+      font-family: var(--t); font-weight: 900;
+      font-size: clamp(0.85rem, 1.5vw, 1.1rem);
+      text-transform: uppercase; letter-spacing: -0.02em;
+    }
+
+    .pk-dl-strip {
+      padding: 10px 3vw; background: var(--bk); cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: opacity 0.12s ease;
+    }
+    .pk-dl-strip:hover { opacity: 0.7; }
+    .pk-dl-strip span {
+      font-family: var(--m); font-weight: 700;
+      font-size: clamp(0.5rem, 0.9vw, 0.7rem);
+      color: var(--pk); text-transform: uppercase; letter-spacing: 0.15em;
+    }
+
+    /* PHOTO PREVIEW */
+    .preview { position: fixed; inset: 0; z-index: 10000; display: none; align-items: center; justify-content: center; background: rgba(0,0,0,0.94); }
+    .preview.on { display: flex; }
+    .preview-wrap { display: flex; align-items: center; width: 95vw; max-width: 1000px; }
+    .preview-nav {
+      flex-shrink: 0; width: 44px; height: 44px; cursor: pointer;
+      background: var(--bk); border: 3px solid var(--pk);
+      color: var(--pk); font-weight: 900; font-size: 1.5rem;
+      display: flex; align-items: center; justify-content: center;
+      transition: opacity 0.12s ease;
+    }
+    .preview-nav.off { opacity: 0.2; pointer-events: none; }
+    .preview-center { flex: 1; margin: 0 12px; min-width: 0; }
+    .preview-img-box { border: 3px solid var(--pk); }
+    .preview-img-box img { width: 100%; display: block; max-height: 65vh; object-fit: cover; }
+    .preview-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 12px; background: var(--bk);
+      border: 3px solid var(--pk); border-top: none;
+    }
+    .preview-lbl {
+      font-family: var(--m); font-weight: 700;
+      font-size: 0.55rem; color: var(--pk);
+      text-transform: uppercase; letter-spacing: 0.08em;
+    }
+    .preview-acts { display: flex; gap: 4px; }
+    .preview-dl {
+      font-family: var(--m); font-weight: 700; cursor: pointer;
+      font-size: 0.45rem; color: var(--bk); background: var(--pk);
+      border: none; padding: 3px 10px; text-transform: uppercase; letter-spacing: 0.08em;
+    }
+    .preview-dl:hover { opacity: 0.8; }
+    .preview-x {
+      font-family: var(--m); font-weight: 700; cursor: pointer;
+      font-size: 0.45rem; color: var(--pk); background: var(--bk);
+      border: 3px solid var(--pk); padding: 3px 10px; text-transform: uppercase; letter-spacing: 0.08em;
+    }
+    .preview-x:hover { opacity: 0.8; }
+
+    /* RESPONSIVE */
+    .hide-sm { display: none; }
+    .hide-md { display: none; }
+
+    @media (max-width: 600px) {
+      #page-home.active { grid-template-rows: auto 1fr auto auto; }
+      .home-photo { min-height: 25dvh; }
+      .home-nav { justify-content: flex-start; padding: 0 3vw 0; }
+      .home-nav a { font-size: 20vw; line-height: 0.92; }
+    }
+    @media (max-width: 500px) {
+      .home-footer { grid-template-columns: 1fr 1fr; gap: 2px 0; }
+      .home-footer span:nth-child(even) { text-align: right; }
+    }
+    @media (max-width: 640px) {
+      .about-bottom { grid-template-columns: 1fr; }
+      .about-bottom-left { border-right: none; border-bottom: var(--b); }
+    }
+    @media (min-width: 640px) { .hide-sm { display: inline; } }
+    @media (min-width: 768px) {
+      .hide-md { display: inline; }
+      .home-name h1 { font-size: clamp(4.5rem, 10vw, 9rem); }
+      .home-nav a { font-size: clamp(4rem, 8.5vw, 8rem); line-height: 0.95; }
+      #page-home.active { grid-template-rows: auto 28dvh 1fr auto; }
+    }
+    @media (max-width: 768px) {
+      .pk-body { grid-template-columns: 1fr; }
+      .pk-left { border-right: none; border-bottom: var(--b); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- HOME -->
+<div id="page-home" class="page active">
+  <div class="home-name"><h1>LAZIZZE</h1></div>
+  <div class="home-photo halftone">
+    <img src="photos/IMG_0637.jpg" alt="LAZIZZE performing">
+  </div>
+  <div class="home-nav">
+    <a href="#/about" onclick="go('about'); return false;">ABOUT</a>
+    <a href="#/sounds" onclick="go('sounds'); return false;">SOUNDS</a>
+    <a href="#/presskit" onclick="go('presskit'); return false;">PRESSKIT</a>
+  </div>
+  <div class="home-footer">
+    <span>HOUSE MUSIC</span>
+    <span>LAUSANNE</span>
+    <span>DJ</span>
+    <span>MGMT@LAZIZZE.COM</span>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<div id="page-about" class="page">
+  <div class="inner-shell">
+    <div class="inner-content">
+      <div class="pg-title"><h1>ABOUT</h1></div>
+      <div class="marquee-strip">
+        <div class="marquee-inner">
+          <span>CHICAGO — FRENCH TOUCH — OMAR S — JUSTICE — GROOVE — DANCEFLOOR — VINYL — LAUSANNE — 4AM SETS — HOUSE — DISCO — FUNK — SOUL — PACKED CLUBS — STEAMY WINDOWS — GOOD ENERGY — CHICAGO — FRENCH TOUCH — OMAR S — JUSTICE — GROOVE — DANCEFLOOR — VINYL — LAUSANNE — 4AM SETS — HOUSE — DISCO — FUNK — SOUL — PACKED CLUBS — STEAMY WINDOWS — GOOD ENERGY — CHICAGO — FRENCH TOUCH — OMAR S — JUSTICE — GROOVE — DANCEFLOOR — VINYL — LAUSANNE — 4AM SETS — HOUSE — DISCO — FUNK — SOUL — PACKED CLUBS — STEAMY WINDOWS — GOOD ENERGY —&nbsp;</span>
+        </div>
+      </div>
+      <div class="about-bio-main">
+        <p>LAZIZZE IS A HOUSE DJ FROM LAUSANNE WHO'S BEEN SOAKING UP NIGHTLIFE CULTURE FOR YEARS. ROOTED IN CHICAGO'S HERITAGE AND FUELED BY FRENCH TOUCH ENERGY, THE SOUND IS ALL ABOUT ONE THING: A GROOVE THAT KNOWS WHERE IT'S GOING.</p>
+      </div>
+      <div class="about-photo halftone">
+        <img src="photos/le-memo.png" alt="Le Memo">
+      </div>
+      <div class="about-bottom">
+        <div class="about-bottom-left">
+          <p>NO GIMMICKS, NO FUSS — JUST THE URGENCY OF PACKED CLUBS, STEAMY WINDOWS, AND THOSE MOMENTS WHEN BODIES FORGET THEMSELVES ON THE DANCEFLOOR. 50+ DATES THIS YEAR, CHASING THAT TIPPING POINT WHERE THE SMILE BECOMES CONTAGIOUS AND THE RHYTHM TAKES OVER EVERYTHING ELSE.</p>
+        </div>
+        <div class="about-details">
+          <div class="about-detail" style="border-right:var(--b);border-bottom:var(--b)">
+            <span class="about-detail-lbl">BASED</span>
+            <span class="about-detail-val">LAUSANNE</span>
+          </div>
+          <div class="about-detail" style="border-bottom:var(--b)">
+            <span class="about-detail-lbl">SOUND</span>
+            <span class="about-detail-val">HOUSE / FRENCH TOUCH</span>
+          </div>
+          <div class="about-detail" style="border-right:var(--b)">
+            <span class="about-detail-lbl">INFLUENCES</span>
+            <span class="about-detail-val">CHICAGO / OMAR S / JUSTICE</span>
+          </div>
+          <div class="about-detail">
+            <span class="about-detail-lbl">2025</span>
+            <span class="about-detail-val">50+ DATES</span>
+          </div>
+        </div>
+      </div>
+      <div class="about-socials">
+        <a href="https://instagram.com/lazizze" target="_blank" rel="noopener" class="about-social">INSTAGRAM</a>
+        <a href="https://soundcloud.com/lazizze" target="_blank" rel="noopener" class="about-social">SOUNDCLOUD</a>
+        <a href="#" class="about-social">RESIDENT ADVISOR</a>
+      </div>
+    </div>
+    <nav class="bottom-nav" data-nav="about"></nav>
+  </div>
+</div>
+
+<!-- SOUNDS -->
+<div id="page-sounds" class="page">
+  <div class="inner-shell">
+    <div class="inner-content">
+      <div class="pg-title"><h1>SOUNDS</h1></div>
+      <div class="sounds-sub"><span>SELECTIONS &amp; FAVORITES — WHAT MOVES THE DANCEFLOOR</span></div>
+      <div id="tracks-box"></div>
+      <div class="sounds-cta"><span>MORE ON SOUNDCLOUD / MIXCLOUD</span></div>
+    </div>
+    <nav class="bottom-nav" data-nav="sounds"></nav>
+  </div>
+</div>
+
+<!-- PRESSKIT -->
+<div id="page-presskit" class="page">
+  <div class="inner-shell">
+    <div class="inner-content">
+      <div class="pk-head">
+        <h1>PRESSKIT</h1>
+        <div class="pk-lang">
+          <button class="active" data-lang="EN" onclick="setLang('EN')">EN</button>
+          <button data-lang="FR" onclick="setLang('FR')">FR</button>
+        </div>
+      </div>
+      <div class="pk-sub"><span id="pk-sub-t">FOR BOOKING AGENCIES &amp; PRESS — PREVIEW &amp; DOWNLOAD</span></div>
+      <div class="pk-body">
+        <div class="pk-left">
+          <div class="pk-lbl">
+            <span id="pk-ph-lbl">PHOTOS — HI-RES (8)</span>
+            <button class="pk-lbl-btn" onclick="dlAll()">DOWNLOAD ALL</button>
+          </div>
+          <div class="pk-photos" id="pk-photos"></div>
+          <div class="pk-see" onclick="togglePhotos()"><span id="pk-see-t"></span></div>
+          <div class="pk-lbl"><span id="pk-vid-lbl">VIDEOS (3)</span></div>
+          <div id="pk-vids"></div>
+        </div>
+        <div class="pk-right">
+          <div class="pk-lbl">
+            <span id="pk-bio-lbl">BIOGRAPHY — EN</span>
+            <button class="pk-lbl-btn" onclick="dlBio()">↓ .TXT</button>
+          </div>
+          <div class="pk-bio"><p id="pk-bio-t"></p></div>
+          <div class="pk-info" id="pk-info"></div>
+          <div class="pk-dl-strip" onclick="dlAll()"><span id="pk-dl-t">↓ DOWNLOAD FULL PRESSKIT</span></div>
+        </div>
+      </div>
+    </div>
+    <nav class="bottom-nav" data-nav="presskit"></nav>
+  </div>
+</div>
+
+<!-- PHOTO PREVIEW -->
+<div class="preview" id="preview" onclick="if(event.target===this)closePv()">
+  <div class="preview-wrap">
+    <button class="preview-nav" id="pv-prev" onclick="navPv(-1)">&#8249;</button>
+    <div class="preview-center">
+      <div class="preview-img-box"><img id="pv-img" src="" alt="Preview"></div>
+      <div class="preview-bar">
+        <span class="preview-lbl" id="pv-lbl"></span>
+        <div class="preview-acts">
+          <button class="preview-dl" onclick="dlPvPhoto()">↓ DOWNLOAD</button>
+          <button class="preview-x" onclick="closePv()">✕ CLOSE</button>
+        </div>
+      </div>
+    </div>
+    <button class="preview-nav" id="pv-next" onclick="navPv(1)">&#8250;</button>
+  </div>
+</div>
+
+<script>
+const TRACKS = [
+  { id:1, title:"ONEONEONE", file:"songs/Oneoneone .mp3" },
+  { id:2, title:"TO THE MUSIC", file:"songs/TO THE MUSIC.mp3" },
+  { id:3, title:"JUSTICE & SIMIAN — WE ARE YOUR FRIENDS", file:"songs/Justice & Simian - We Are Your Friends (Justice Vs Simian).mp3" },
+  { id:4, title:"BIG STRICK & GENERATION NEXT — BANG MY SHIT", file:"songs/Big Strick & Generation Next - Bang My Shit.mp3" },
+  { id:5, title:"DJ ASSAULT & CRAIG DIAMONDS — U AIN'T ALL THAT", file:"songs/DJ Assault & Craig Diamonds - U Ain't All That.mp3" },
+  { id:6, title:"ED MOTTA — COLOMBINA", file:"songs/Ed Motta - Colombina.mp3" },
+  { id:7, title:"CRAZY P — STOP SPACE RETURN", file:"songs/Crazy P - Stop Space Return.mp3" },
+  { id:8, title:"THE GAP BAND — EARLY IN THE MORNING", file:"songs/The Gap Band - Early In The Morning.mp3" },
+  { id:9, title:"BUSY P — PROCRASTINATOR (HEY TODAY! REMIX)", file:"songs/Busy P - Procrastinator (Hey Today! Remix).mp3" },
+  { id:10, title:"TECHNOLOGIC (SPEEDY PALO EDIT)", file:"songs/Technologic (Speedy Palo Edit) 138 VF.aif" },
+  { id:11, title:"UNFINISHED BUSINESS", file:"songs/unfinished-business.mp3" },
+  { id:12, title:"KERRI CHANDLER — BROOKLYN FT. E-MAN", file:"songs/kerri-chandler-brooklyn-feat-e-man.mp3" },
+];
+
+const PHOTOS = [
+  { id:1, lbl:"PRESS PHOTO 01", src:"photos/IMG_2686 2.jpg" },
+  { id:2, lbl:"PRESS PHOTO 02", src:"photos/5b837873-e09c-4faf-bed6-292d6bcee1ad 2.JPG" },
+  { id:3, lbl:"PRESS PHOTO 03", src:"photos/IMG_6912.jpg" },
+  { id:4, lbl:"PRESS PHOTO 04", src:"photos/58b7b377-a1ee-4f3b-8d25-e8e8dd5ed3d9.jpg" },
+  { id:5, lbl:"PRESS PHOTO 05", src:"photos/0f47fab6-67ff-44f3-ac5a-c42605e29e4e.JPG" },
+  { id:6, lbl:"PRESS PHOTO 06", src:"photos/IMG_2122.jpg" },
+];
+
+const VIDEOS = [
+  { id:1, lbl:"LAZIZZE — MIX 01", dur:"", type:"MIX", eid:"Mj4VYYxA4sE" },
+  { id:2, lbl:"LAZIZZE — MIX 02", dur:"", type:"MIX", eid:"-sXghBqprmo" },
+  { id:3, lbl:"LAZIZZE — MIX 03", dur:"", type:"MIX", eid:"ocSNGr3kcIY" },
+];
+
+const BIO = {
+  EN:"HOUSE DJ FROM LAUSANNE. ROOTED IN CHICAGO AND FUELED BY FRENCH TOUCH ENERGY. NO GIMMICKS — JUST PACKED CLUBS, STEAMY WINDOWS, AND THOSE MOMENTS WHEN THE RHYTHM TAKES OVER.",
+  FR:"DJ HOUSE ORIGINAIRE DE LAUSANNE. ENRACIN\u00c9 DANS CHICAGO ET PORT\u00c9 PAR L\u2019\u00c9NERGIE DE LA FRENCH TOUCH. PAS DE CHICHIS — JUSTE DES CLUBS BOND\u00c9S, LA BU\u00c9E SUR LES VITRES ET CES MOMENTS O\u00d9 LE RYTHME PREND LE CONTR\u00d4LE."
+};
+
+let cur = 'home', playing = null, prog = {}, lang = 'EN', allPh = false, aVid = null, pvId = null;
+let audio = new Audio();
+audio.addEventListener('timeupdate', () => {
+  if (playing && audio.duration) {
+    prog[playing] = (audio.currentTime / audio.duration) * 100;
+    const fill = document.getElementById('pfill-' + playing);
+    if (fill) fill.style.width = prog[playing] + '%';
+    const durEl = document.getElementById('dur-' + playing);
+    if (durEl) {
+      const rem = audio.duration - audio.currentTime;
+      const m = Math.floor(rem / 60), s = Math.floor(rem % 60);
+      durEl.textContent = '-' + m + ':' + (s < 10 ? '0' : '') + s;
+    }
+  }
+});
+audio.addEventListener('ended', () => { playing = null; renderTracks(); });
+
+function navHTML(active) {
+  const links = [
+    { h:'#/', l:'HOME', p:'home' },
+    { h:'#/about', l:'ABOUT', p:'about' },
+    { h:'#/sounds', l:'SOUNDS', p:'sounds' },
+    { h:'#/presskit', l:'PRESSKIT', p:'presskit' },
+  ];
+  let s = '<div class="nav-links">';
+  links.forEach(lk => {
+    s += `<a href="${lk.h}" class="${lk.p===active?'active':''}" onclick="go('${lk.p}');return false;">${lk.l}</a>`;
+  });
+  s += '</div><div class="nav-footer"><span>LAZIZZE &copy; 2026</span><span>ALL RIGHTS RESERVED</span></div>';
+  return s;
+}
+
+function updNav() {
+  document.querySelectorAll('.bottom-nav[data-nav]').forEach(n => {
+    n.innerHTML = navHTML(n.dataset.nav);
+  });
+}
+
+function go(p) {
+  document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
+  document.getElementById('page-' + p).classList.add('active');
+  cur = p;
+  window.location.hash = p === 'home' ? '/' : '/' + p;
+  updNav();
+  window.scrollTo(0, 0);
+}
+
+function onHash() {
+  const h = (window.location.hash || '#/').replace('#/', '') || 'home';
+  if (['home','about','sounds','presskit'].includes(h)) go(h); else go('home');
+}
+window.addEventListener('hashchange', onHash);
+
+function renderTracks() {
+  const box = document.getElementById('tracks-box');
+  let s = '';
+  TRACKS.forEach((t, i) => {
+    if (i === 6) {
+      s += `<div class="photo-break halftone"><img src="photos/IMG_2686 2.jpg" alt="Photo"></div>`;
+    }
+    const on = playing === t.id;
+    s += `<div class="trk ${on?'playing':''}" onclick="toggleTrk(${t.id})">
+      <div class="trk-inner">
+        <div class="trk-play">${on?'II':'▶'}</div>
+        <span class="trk-name">${t.title}</span>
+        <span class="trk-meta" id="dur-${t.id}">${on && audio.duration ? ('-'+Math.floor((audio.duration-audio.currentTime)/60)+':'+String(Math.floor((audio.duration-audio.currentTime)%60)).padStart(2,'0')) : ''}</span>
+      </div>
+      ${on?`<div class="trk-progress"><div class="trk-pbar"><div class="trk-pfill" id="pfill-${t.id}" style="width:${prog[t.id]||0}%"></div></div></div>`:''}
+    </div>`;
+  });
+  box.innerHTML = s;
+}
+
+function toggleTrk(id) {
+  if (playing === id) { audio.pause(); playing = null; }
+  else {
+    const t = TRACKS.find(x => x.id === id);
+    if (t) { audio.src = t.file; audio.play(); }
+    playing = id; prog[id] = 0;
+  }
+  renderTracks();
+}
+
+function setLang(l) {
+  lang = l;
+  document.querySelectorAll('.pk-lang button').forEach(b => b.classList.toggle('active', b.dataset.lang === l));
+  renderPK();
+}
+
+function togglePhotos() { allPh = !allPh; renderPhotos(); }
+
+function renderPhotos() {
+  const ph = allPh ? PHOTOS : PHOTOS.slice(0, 3);
+  const grid = document.getElementById('pk-photos');
+  grid.style.gridTemplateColumns = `repeat(${ph.length}, 1fr)`;
+  let s = '';
+  ph.forEach((p, i) => {
+    s += `<div class="pk-photo-cell" style="${i<ph.length-1?'border-right:var(--b);':''}" onclick="openPv(${p.id})">
+      <div class="halftone" style="width:100%;height:100%"><img src="${p.src}" alt="${p.lbl}"></div>
+      <div class="pk-photo-ov"><span>${p.lbl}</span><button onclick="event.stopPropagation();dlFile('${p.src}','${p.lbl}')">↓ DL</button></div>
+    </div>`;
+  });
+  grid.innerHTML = s;
+  document.getElementById('pk-see-t').textContent = allPh
+    ? (lang==='EN'?'▲ SHOW LESS':'▲ VOIR MOINS')
+    : (lang==='EN'?`▼ SEE ALL ${PHOTOS.length} PHOTOS`:`▼ VOIR LES ${PHOTOS.length} PHOTOS`);
+}
+
+function renderVids() {
+  const box = document.getElementById('pk-vids');
+  let s = '';
+  VIDEOS.forEach((v, i) => {
+    const on = aVid === v.id;
+    const idx = i, hasPrev = idx>0, hasNext = idx<VIDEOS.length-1;
+    s += `<div class="pk-vid" ${i<VIDEOS.length-1?'style="border-bottom:var(--b)"':''}>
+      <div class="pk-vid-hd ${on?'active':''}" onclick="togVid(${v.id})">
+        <div class="pk-vid-left">
+          <span class="pk-vid-ico">${on?'▼':'▶'}</span>
+          <span class="pk-vid-nm">${v.lbl}</span>
+        </div>
+        <div class="pk-vid-right">
+          <span class="pk-vid-dur hide-sm">${v.dur}</span>
+          <span class="pk-vid-tag">${v.type}</span>
+        </div>
+      </div>`;
+    if (on) {
+      s += `<div class="pk-vid-player">
+        <div class="pk-vid-embed"><iframe src="https://www.youtube.com/embed/${v.eid}?autoplay=1&rel=0&modestbranding=1" allow="autoplay;encrypted-media" allowfullscreen></iframe></div>
+        <div class="pk-vid-ctrl">
+          <button class="pk-vid-btn ${hasPrev?'':'disabled'}" onclick="event.stopPropagation();${hasPrev?`setVid(${VIDEOS[idx-1].id})`:''}"><span class="arr">‹</span><span class="lbl hide-sm">PREV</span></button>
+          <div class="pk-vid-mid">
+            <span class="pk-vid-idx">${idx+1} / ${VIDEOS.length}</span>
+            <button class="pk-vid-open" onclick="event.stopPropagation();window.open('https://www.youtube.com/watch?v=${v.eid}','_blank')">↓ ${lang==='EN'?'DOWNLOAD / OPEN':'TÉLÉCHARGER / OUVRIR'}</button>
+          </div>
+          <button class="pk-vid-btn ${hasNext?'':'disabled'}" onclick="event.stopPropagation();${hasNext?`setVid(${VIDEOS[idx+1].id})`:''}"><span class="lbl hide-sm">NEXT</span><span class="arr">›</span></button>
+        </div>
+      </div>`;
+    }
+    s += '</div>';
+  });
+  box.innerHTML = s;
+}
+
+function togVid(id) { aVid = aVid===id ? null : id; renderVids(); }
+function setVid(id) { aVid = id; renderVids(); }
+
+function renderPK() {
+  document.getElementById('pk-sub-t').innerHTML = lang==='EN'
+    ? 'FOR BOOKING AGENCIES &amp; PRESS — PREVIEW &amp; DOWNLOAD'
+    : 'POUR AGENCES DE BOOKING &amp; PRESSE — PRÉVISUALISER &amp; TÉLÉCHARGER';
+  document.getElementById('pk-ph-lbl').textContent = (lang==='EN'?'PHOTOS — HI-RES':'PHOTOS — HAUTE RÉSOLUTION')+` (${PHOTOS.length})`;
+  document.getElementById('pk-vid-lbl').textContent = (lang==='EN'?'VIDEOS':'VIDÉOS')+` (${VIDEOS.length})`;
+  document.getElementById('pk-bio-lbl').textContent = (lang==='EN'?'BIOGRAPHY':'BIOGRAPHIE')+` — ${lang}`;
+  document.getElementById('pk-bio-t').textContent = BIO[lang];
+  document.getElementById('pk-dl-t').textContent = '↓ '+(lang==='EN'?'DOWNLOAD FULL PRESSKIT':'TÉLÉCHARGER LE PRESSKIT COMPLET');
+  const info = [
+    { l:'GENRE', v:'HOUSE / FRENCH TOUCH' },
+    { l:lang==='EN'?'BASED':'BASÉ À', v:'LAUSANNE, CH' },
+    { l:'BOOKING', v:'MGMT@LAZIZZE.COM' },
+    { l:'PRESS', v:'PRESS@LAZIZZE.COM' },
+  ];
+  let h = '';
+  info.forEach((it, i) => {
+    const br = i%2===0?'border-right:var(--b);':'';
+    const bb = i<2?'border-bottom:var(--b);':'';
+    h += `<div class="pk-info-cell" style="${br}${bb}"><span class="pk-info-lbl">${it.l}</span><span class="pk-info-val">${it.v}</span></div>`;
+  });
+  document.getElementById('pk-info').innerHTML = h;
+  renderPhotos();
+  renderVids();
+}
+
+function openPv(id) { pvId=id; updPv(); document.getElementById('preview').classList.add('on'); }
+function closePv() { pvId=null; document.getElementById('preview').classList.remove('on'); }
+function navPv(d) {
+  const ph = allPh?PHOTOS:PHOTOS.slice(0,3);
+  const idx = ph.findIndex(p=>p.id===pvId)+d;
+  if (idx>=0 && idx<ph.length) { pvId=ph[idx].id; updPv(); }
+}
+function updPv() {
+  const ph = allPh?PHOTOS:PHOTOS.slice(0,3);
+  const p = PHOTOS.find(x=>x.id===pvId), idx = ph.findIndex(x=>x.id===pvId);
+  document.getElementById('pv-img').src = p.src;
+  document.getElementById('pv-lbl').textContent = `${p.lbl} — ${idx+1}/${ph.length}`;
+  document.getElementById('pv-prev').classList.toggle('off', idx===0);
+  document.getElementById('pv-next').classList.toggle('off', idx===ph.length-1);
+}
+function dlPvPhoto() { const p=PHOTOS.find(x=>x.id===pvId); if(p) dlFile(p.src,p.lbl); }
+
+function dlFile(url, name) {
+  const a=document.createElement('a'); a.href=url; a.download='lazizze-'+name+'.jpg';
+  a.target='_blank'; a.rel='noopener noreferrer'; a.click();
+}
+function dlAll() { PHOTOS.forEach(p=>dlFile(p.src,p.lbl)); }
+function dlBio() {
+  const b=new Blob([BIO[lang]],{type:'text/plain'}), u=URL.createObjectURL(b);
+  const a=document.createElement('a'); a.href=u; a.download=`lazizze-bio-${lang.toLowerCase()}.txt`; a.click();
+  URL.revokeObjectURL(u);
+}
+
+renderTracks();
+renderPK();
+updNav();
+onHash();
+</script>
+</body>
+</html>
