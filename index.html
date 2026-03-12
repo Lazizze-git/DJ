@@ -50,6 +50,7 @@
     }
 
     .home-photo { min-height: 0; }
+    .home-left { display: contents; }
 
     .home-nav { display: flex; flex-direction: column; justify-content: flex-end; padding: 0 3vw 1vw; }
     .home-nav a {
@@ -135,7 +136,14 @@
       100% { transform: translateX(-33.33%); }
     }
 
-    .about-bio-main { padding: 4vw 3vw; border-bottom: var(--b); }
+    .about-hero { border-bottom: var(--b); }
+    @media (min-width: 768px) {
+      .about-hero { display: flex; }
+      .about-bio-main { flex: 1; }
+      .about-hero .about-photo { width: 35%; min-width: 280px; height: auto; border-left: var(--b); }
+      .about-hero .about-photo img { height: 100%; }
+    }
+    .about-bio-main { padding: 4vw 3vw; }
     .about-bio-main p {
       font-family: var(--t); font-weight: 900;
       font-size: clamp(1.3rem, 3.8vw, 3.2rem);
@@ -143,7 +151,10 @@
       text-transform: uppercase;
     }
 
-    .about-photo { height: clamp(120px, 20vw, 220px); }
+    .about-photo { height: clamp(120px, 20vw, 220px); border-bottom: var(--b); }
+    @media (min-width: 768px) {
+      .about-photo { height: auto; border-bottom: none; }
+    }
 
     .about-bottom { display: grid; grid-template-columns: 1fr 1fr; flex: 1; }
     .about-bottom-left { padding: 4vw 3vw; border-right: var(--b); }
@@ -186,6 +197,9 @@
 
     #page-about .inner-content { padding-bottom: 70px; }
 
+    #page-sounds .inner-shell { min-height: auto; }
+    #page-sounds .inner-content { flex: none; padding-bottom: 0; }
+
     /* SOUNDS */
     .sounds-sub { padding: 8px 3vw; background: var(--bk); border-bottom: var(--b); }
     .sounds-sub span {
@@ -223,6 +237,23 @@
     .trk-pfill { height: 100%; background: var(--pk); transition: width 0.3s ease; }
 
     .photo-break { height: clamp(100px, 22vw, 240px); border-bottom: var(--b); }
+
+    .sounds-body { }
+    .sounds-photo-side { display: none; }
+    @media (min-width: 768px) {
+      .sounds-body { display: flex; }
+      .sounds-body-left { flex: 1; min-width: 0; }
+      .sounds-body .photo-break { display: none; }
+      .sounds-photo-side {
+        display: block; width: 35%; min-width: 280px;
+        border-left: var(--b);
+      }
+      .sounds-photo-side img {
+        width: 100%; height: 100%; object-fit: cover; display: block;
+        filter: grayscale(100%) contrast(1.3);
+        mix-blend-mode: normal;
+      }
+    }
 
     .sounds-cta { padding: 14px 2vw; background: var(--bk); text-align: center; }
     .sounds-cta span {
@@ -480,6 +511,7 @@
       .home-photo { min-height: 25dvh; }
       .home-nav { justify-content: flex-start; padding: 0 3vw 0; }
       .home-nav a { font-size: 20vw; line-height: 0.92; }
+      .home-photo-side { display: none !important; }
     }
     @media (max-width: 500px) {
       .home-footer { grid-template-columns: 1fr 1fr; gap: 2px 0; }
@@ -494,7 +526,24 @@
       .hide-md { display: inline; }
       .home-name h1 { font-size: clamp(4.5rem, 10vw, 9rem); }
       .home-nav a { font-size: clamp(4rem, 8.5vw, 8rem); line-height: 0.95; }
-      #page-home.active { grid-template-rows: auto 28dvh 1fr auto; }
+      #page-home.active {
+        grid-template-rows: 1fr auto;
+        grid-template-columns: 1fr 35%;
+      }
+      .home-left {
+        display: flex; flex-direction: column;
+        grid-row: 1 / 2; grid-column: 1 / 2;
+      }
+      .home-left .home-name { flex: 0 0 auto; }
+      .home-left .home-nav { flex: 1; }
+      .home-left .home-photo { display: none; }
+      .home-photo-side {
+        display: block !important;
+        grid-row: 1 / 2; grid-column: 2 / 3;
+        border-left: var(--b);
+      }
+      .home-photo-side img { width: 100%; height: 100%; object-fit: cover; display: block; }
+      .home-footer { grid-column: 1 / -1; }
     }
     @media (max-width: 768px) {
       .pk-body { grid-template-columns: 1fr; }
@@ -506,14 +555,19 @@
 
 <!-- HOME -->
 <div id="page-home" class="page active">
-  <div class="home-name"><h1>LAZIZZE</h1></div>
-  <div class="home-photo halftone">
-    <img src="photos/IMG_0637.jpg" alt="LAZIZZE performing">
+  <div class="home-left">
+    <div class="home-name"><h1>LAZIZZE</h1></div>
+    <div class="home-photo halftone">
+      <img src="photos/IMG_0637.jpg" alt="LAZIZZE performing">
+    </div>
+    <div class="home-nav">
+      <a href="#/about" onclick="go('about'); return false;">ABOUT</a>
+      <a href="#/sounds" onclick="go('sounds'); return false;">SOUNDS</a>
+      <a href="#/presskit" onclick="go('presskit'); return false;">PRESSKIT</a>
+    </div>
   </div>
-  <div class="home-nav">
-    <a href="#/about" onclick="go('about'); return false;">ABOUT</a>
-    <a href="#/sounds" onclick="go('sounds'); return false;">SOUNDS</a>
-    <a href="#/presskit" onclick="go('presskit'); return false;">PRESSKIT</a>
+  <div class="home-photo-side halftone" style="display:none;">
+    <img src="photos/IMG_0637.jpg" alt="LAZIZZE performing">
   </div>
   <div class="home-footer">
     <span>HOUSE MUSIC</span>
@@ -533,11 +587,13 @@
           <span>CHICAGO — FRENCH TOUCH — OMAR S — JUSTICE — GROOVE — DANCEFLOOR — VINYL — LAUSANNE — 4AM SETS — HOUSE — DISCO — FUNK — SOUL — PACKED CLUBS — STEAMY WINDOWS — GOOD ENERGY — CHICAGO — FRENCH TOUCH — OMAR S — JUSTICE — GROOVE — DANCEFLOOR — VINYL — LAUSANNE — 4AM SETS — HOUSE — DISCO — FUNK — SOUL — PACKED CLUBS — STEAMY WINDOWS — GOOD ENERGY — CHICAGO — FRENCH TOUCH — OMAR S — JUSTICE — GROOVE — DANCEFLOOR — VINYL — LAUSANNE — 4AM SETS — HOUSE — DISCO — FUNK — SOUL — PACKED CLUBS — STEAMY WINDOWS — GOOD ENERGY —&nbsp;</span>
         </div>
       </div>
-      <div class="about-bio-main">
-        <p>LAZIZZE IS A HOUSE DJ FROM LAUSANNE WHO'S BEEN SOAKING UP NIGHTLIFE CULTURE FOR YEARS. ROOTED IN CHICAGO'S HERITAGE AND FUELED BY FRENCH TOUCH ENERGY, THE SOUND IS ALL ABOUT ONE THING: A GROOVE THAT KNOWS WHERE IT'S GOING.</p>
-      </div>
-      <div class="about-photo halftone">
-        <img src="photos/le-memo.png" alt="Le Memo">
+      <div class="about-hero">
+        <div class="about-bio-main">
+          <p>LAZIZZE IS A HOUSE DJ FROM LAUSANNE WHO'S BEEN SOAKING UP NIGHTLIFE CULTURE FOR YEARS. ROOTED IN CHICAGO'S HERITAGE AND FUELED BY FRENCH TOUCH ENERGY, THE SOUND IS ALL ABOUT ONE THING: A GROOVE THAT KNOWS WHERE IT'S GOING.</p>
+        </div>
+        <div class="about-photo halftone">
+          <img src="photos/le-memo.png" alt="Le Memo">
+        </div>
       </div>
       <div class="about-bottom">
         <div class="about-bottom-left">
@@ -578,8 +634,15 @@
     <div class="inner-content">
       <div class="pg-title"><h1>SOUNDS</h1></div>
       <div class="sounds-sub"><span>SELECTIONS &amp; FAVORITES — WHAT MOVES THE DANCEFLOOR</span></div>
-      <div id="tracks-box"></div>
-      <div class="sounds-cta"><span>MORE ON SOUNDCLOUD / MIXCLOUD</span></div>
+      <div class="sounds-body">
+        <div class="sounds-body-left">
+          <div id="tracks-box"></div>
+          <div class="sounds-cta"><span>MORE ON SOUNDCLOUD / MIXCLOUD</span></div>
+        </div>
+        <div class="sounds-photo-side halftone">
+          <img src="photos/IMG_2686 2.jpg" alt="Photo">
+        </div>
+      </div>
     </div>
     <nav class="bottom-nav" data-nav="sounds"></nav>
   </div>
