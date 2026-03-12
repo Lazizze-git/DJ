@@ -398,7 +398,7 @@
 
     .pk-right { display: flex; flex-direction: column; }
 
-    .pk-bio { flex: 1; padding: 2vw; border-bottom: var(--b); }
+    .pk-bio { flex: 1; padding: 2vw; }
     .pk-bio p {
       font-family: var(--t); font-weight: 900;
       font-size: clamp(0.75rem, 1.4vw, 1.05rem);
@@ -406,8 +406,8 @@
       text-transform: uppercase;
     }
 
-    .pk-info { display: grid; grid-template-columns: 1fr 1fr; border-bottom: var(--b); }
-    .pk-info-cell { padding: 12px 16px; }
+    .pk-info { display: grid; grid-template-columns: repeat(4, 1fr); border-top: var(--b); border-bottom: var(--b); }
+    .pk-info-cell { padding: 12px 16px; grid-column: span 2; }
     .pk-info-lbl {
       display: block; font-family: var(--m); font-weight: 700;
       font-size: 0.5rem; text-transform: uppercase;
@@ -614,10 +614,10 @@
             <button class="pk-lbl-btn" onclick="dlBio()">↓ .TXT</button>
           </div>
           <div class="pk-bio"><p id="pk-bio-t"></p></div>
-          <div class="pk-info" id="pk-info"></div>
-          <div class="pk-dl-strip" onclick="dlAll()"><span id="pk-dl-t">↓ DOWNLOAD FULL PRESSKIT</span></div>
         </div>
       </div>
+      <div class="pk-info" id="pk-info"></div>
+      <div class="pk-dl-strip" onclick="dlAll()"><span id="pk-dl-t">↓ DOWNLOAD FULL PRESSKIT</span></div>
     </div>
     <nav class="bottom-nav" data-nav="presskit"></nav>
   </div>
@@ -740,7 +740,7 @@ function renderTracks() {
     const on = playing === t.id;
     s += `<div class="trk ${on?'playing':''}" onclick="toggleTrk(${t.id})">
       <div class="trk-inner">
-        <div class="trk-play">${on?'II':'▶'}</div>
+        <div class="trk-play">${on?'II':'▶\uFE0E'}</div>
         <span class="trk-name">${t.title}</span>
         <span class="trk-meta" id="dur-${t.id}">${on && audio.duration ? ('-'+Math.floor((audio.duration-audio.currentTime)/60)+':'+String(Math.floor((audio.duration-audio.currentTime)%60)).padStart(2,'0')) : ''}</span>
       </div>
@@ -794,7 +794,7 @@ function renderVids() {
     s += `<div class="pk-vid" ${i<VIDEOS.length-1?'style="border-bottom:var(--b)"':''}>
       <div class="pk-vid-hd ${on?'active':''}" onclick="togVid(${v.id})">
         <div class="pk-vid-left">
-          <span class="pk-vid-ico">${on?'▼':'▶'}</span>
+          <span class="pk-vid-ico">${on?'▼\uFE0E':'▶\uFE0E'}</span>
           <span class="pk-vid-nm">${v.lbl}</span>
         </div>
         <div class="pk-vid-right">
