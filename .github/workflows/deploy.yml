@@ -12,13 +12,11 @@ jobs:
       - name: 🚚 Récupération du code
         uses: actions/checkout@v3
 
-      - name: 📂 Envoi vers Infomaniak via SFTP
-        uses: wlixcc/SFTP-Deploy-Action@v1.2.4
+      - name: 📂 Envoi vers Infomaniak via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          local_path: './*'
-          remote_path: '/'
-          sftp_only: true
-          port: 22
+          server-dir: /
+          port: 21
