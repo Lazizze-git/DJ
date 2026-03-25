@@ -3,7 +3,7 @@ name: 🚀 Mise à jour automatique Lazizze
 on:
   push:
     branches:
-      - main  # Vérifiez bien que votre branche s'appelle main (ou changez en master)
+      - main
 
 jobs:
   deploy:
@@ -12,12 +12,13 @@ jobs:
       - name: 🚚 Récupération du code
         uses: actions/checkout@v3
 
-      - name: 📂 Envoi vers Infomaniak
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+      - name: 📂 Envoi vers Infomaniak via SFTP
+        uses: wlixcc/SFTP-Deploy-Action@v1.2.4
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          server-dir: /
-          protocol: ftps
-          port: 990
+          local_path: './*'
+          remote_path: '/'
+          sftp_only: true
+          port: 22
