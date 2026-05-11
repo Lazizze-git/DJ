@@ -4,7 +4,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const PORT = 3000;
+const PORT = process.env.PORT ? Number(process.env.PORT) : 3000;
 
 const MIME_TYPES = {
   '.html': 'text/html',
@@ -17,12 +17,28 @@ const MIME_TYPES = {
   '.gif': 'image/gif',
   '.svg': 'image/svg+xml',
   '.ico': 'image/x-icon',
+  '.webp': 'image/webp',
+  '.heic': 'image/heic',
+  '.mp3': 'audio/mpeg',
+  '.aif': 'audio/aiff',
+  '.aiff': 'audio/aiff',
+  '.wav': 'audio/wav',
+  '.mp4': 'video/mp4',
   '.woff': 'font/woff',
   '.woff2': 'font/woff2',
 };
 
 const server = http.createServer((req, res) => {
-  let filePath = path.join(__dirname, req.url === '/' ? 'index.html' : req.url);
+  const rawPath = (req.url || '/').split('?')[0];
+  let decoded;
+  try { decoded = decodeURIComponent(rawPath); } catch { decoded = rawPath; }
+  const safe = decoded.replace(/\\/g, '/').replace(/\.{2,}/g, '');
+  let filePath = path.join(__dirname, safe === '/' ? 'index.html' : safe);
+  if (!filePath.startsWith(__dirname)) {
+    res.writeHead(403);
+    res.end('Forbidden');
+    return;
+  }
   const ext = path.extname(filePath).toLowerCase();
   const contentType = MIME_TYPES[ext] || 'application/octet-stream';
 

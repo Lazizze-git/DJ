@@ -94,7 +94,7 @@
     .nav-links a:last-child { border-right: none; }
     .nav-links a:hover { opacity: 0.6; }
     .nav-links a:focus-visible { outline: 3px solid var(--bk); outline-offset: -3px; }
-    .nav-links a.active { background: var(--pk); color: var(--bk); }
+    .nav-links a.active { background: var(--bk); color: var(--pk); cursor: default; pointer-events: none; }
     .nav-footer {
       display: flex; align-items: center; justify-content: space-between;
       padding: 5px 3vw; border-top: var(--b);
@@ -107,7 +107,7 @@
 
     /* INNER PAGE SHELL */
     .inner-shell { min-height: 100dvh; display: flex; flex-direction: column; background: var(--pk); }
-    .inner-content { flex: 1; overflow-y: auto; display: flex; flex-direction: column; padding-bottom: 70px; }
+    .inner-content { flex: 1; display: flex; flex-direction: column; padding-bottom: 96px; }
 
     /* PAGE TITLE */
     .pg-title { padding: 1vw 3vw 0; }
@@ -117,6 +117,15 @@
       line-height: 0.88; letter-spacing: -0.04em;
       text-transform: uppercase;
     }
+    .pg-head {
+      display: flex; align-items: flex-end; justify-content: space-between;
+      gap: 16px; padding-right: 4vw;
+    }
+    .pg-head .pg-title { flex: 1; min-width: 0; padding-right: 0; }
+    .pg-head .pg-title h1 {
+      font-size: clamp(2.8rem, 12vw, 10rem);
+    }
+    .pg-head .pk-lang { margin-bottom: 10px; flex-shrink: 0; }
 
     /* ABOUT */
     .marquee-strip {
@@ -145,9 +154,9 @@
     }
     .about-bio-main { padding: 4vw 3vw; }
     .about-bio-main p {
-      font-family: var(--t); font-weight: 900;
-      font-size: clamp(1.3rem, 3.8vw, 3.2rem);
-      line-height: 1.05; letter-spacing: -0.03em;
+      font-family: var(--t); font-weight: 800;
+      font-size: clamp(0.95rem, 1.5vw, 1.25rem);
+      line-height: 1.45; letter-spacing: -0.005em;
       text-transform: uppercase;
     }
 
@@ -159,9 +168,9 @@
     .about-bottom { display: grid; grid-template-columns: 1fr 1fr; flex: 1; }
     .about-bottom-left { padding: 4vw 3vw; border-right: var(--b); }
     .about-bottom-left p {
-      font-family: var(--t); font-weight: 900;
-      font-size: clamp(0.8rem, 1.3vw, 1rem);
-      line-height: 1.3; text-transform: uppercase; opacity: 0.75;
+      font-family: var(--t); font-weight: 700;
+      font-size: clamp(0.75rem, 1.05vw, 0.9rem);
+      line-height: 1.45; text-transform: uppercase; opacity: 0.75;
     }
     .about-details { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; }
     .about-detail { padding: 4px 16px; }
@@ -197,8 +206,8 @@
 
     #page-about .inner-content { padding-bottom: 70px; }
 
-    #page-sounds .inner-shell { min-height: auto; }
-    #page-sounds .inner-content { flex: none; padding-bottom: 0; }
+    #page-sounds .inner-shell { min-height: 100dvh; }
+    #page-sounds .inner-content { flex: 1; padding-bottom: 96px; }
 
     /* SOUNDS */
     .sounds-sub { padding: 8px 3vw; background: var(--bk); border-bottom: var(--b); }
@@ -213,12 +222,14 @@
     .trk.playing { background: var(--bk); }
     .trk-inner { display: flex; align-items: center; gap: 10px; padding: 10px 3vw; }
     .trk-play {
-      width: 24px; height: 24px; flex-shrink: 0;
+      width: 28px; height: 28px; flex-shrink: 0;
       border: 3px solid var(--bk); display: flex;
       align-items: center; justify-content: center;
-      font-size: 0.5rem; font-weight: 900;
+      font-size: 0.85rem; font-weight: 900; line-height: 1;
     }
     .trk.playing .trk-play { border-color: var(--pk); color: var(--pk); }
+    .trk.unavailable { opacity: 0.4; cursor: not-allowed; }
+    .trk.unavailable:hover { opacity: 0.4; }
     .trk-name {
       flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
       font-family: var(--t); font-weight: 900;
@@ -263,16 +274,6 @@
     }
 
     /* PRESSKIT */
-    .pk-head {
-      display: flex; align-items: flex-end; justify-content: space-between;
-      padding: 0.5vw 2vw 0;
-    }
-    .pk-head h1 {
-      font-family: var(--t); font-weight: 900;
-      font-size: clamp(3rem, 14vw, 12rem);
-      line-height: 0.88; letter-spacing: -0.04em;
-      text-transform: uppercase;
-    }
     .pk-lang { display: flex; gap: 4px; margin-bottom: 8px; }
     .pk-lang button {
       font-family: var(--m); font-weight: 700; cursor: pointer;
@@ -320,10 +321,14 @@
 
     .pk-photos {
       display: grid; grid-template-columns: repeat(3, 1fr);
-      border-bottom: var(--b); min-height: 200px;
+      border-bottom: var(--b);
     }
-    .pk-photo-cell { position: relative; overflow: hidden; cursor: pointer; border-right: var(--b); }
-    .pk-photo-cell:last-child { border-right: none; }
+    .pk-photo-cell {
+      position: relative; overflow: hidden; cursor: pointer;
+      border-right: var(--b); aspect-ratio: 1 / 1;
+    }
+    .pk-photo-cell.no-r { border-right: none; }
+    .pk-photo-cell.has-b { border-bottom: var(--b); }
     .pk-photo-ov {
       position: absolute; inset: 0; display: flex; flex-direction: column;
       align-items: center; justify-content: center;
@@ -437,8 +442,11 @@
       text-transform: uppercase;
     }
 
-    .pk-info { display: grid; grid-template-columns: repeat(4, 1fr); border-top: var(--b); border-bottom: var(--b); }
-    .pk-info-cell { padding: 12px 16px; grid-column: span 2; }
+    .pk-info {
+      display: grid; grid-template-columns: 1fr 1fr;
+      border-top: var(--b); border-bottom: var(--b);
+    }
+    .pk-info-cell { padding: 12px 16px; min-width: 0; }
     .pk-info-lbl {
       display: block; font-family: var(--m); font-weight: 700;
       font-size: 0.5rem; text-transform: uppercase;
@@ -447,8 +455,10 @@
     .pk-info-val {
       display: block; margin-top: 4px;
       font-family: var(--t); font-weight: 900;
-      font-size: clamp(0.85rem, 1.5vw, 1.1rem);
+      font-size: clamp(0.7rem, 1.4vw, 1.1rem);
       text-transform: uppercase; letter-spacing: -0.02em;
+      overflow-wrap: anywhere; word-break: break-word;
+      line-height: 1.15;
     }
 
     .pk-dl-strip {
@@ -549,6 +559,9 @@
       .pk-body { grid-template-columns: 1fr; }
       .pk-left { border-right: none; border-bottom: var(--b); }
     }
+    @media (max-width: 480px) {
+      .pk-lang { margin-bottom: 12px; }
+    }
   </style>
 </head>
 <body>
@@ -556,24 +569,24 @@
 <!-- HOME -->
 <div id="page-home" class="page active">
   <div class="home-left">
-    <div class="home-name"><h1>LAZIZZE</h1></div>
+    <div class="home-name"><h1>Lazizze</h1></div>
     <div class="home-photo halftone">
-      <img src="photos/IMG_0637.jpg" alt="LAZIZZE performing">
+      <img src="photos/IMG_0637.jpg" alt="Lazizze performing">
     </div>
     <div class="home-nav">
-      <a href="#/about" onclick="go('about'); return false;">ABOUT</a>
-      <a href="#/sounds" onclick="go('sounds'); return false;">SOUNDS</a>
-      <a href="#/presskit" onclick="go('presskit'); return false;">PRESSKIT</a>
+      <a href="#/about" onclick="go('about'); return false;">About</a>
+      <a href="#/sounds" onclick="go('sounds'); return false;">Track-ID</a>
+      <a href="#/presskit" onclick="go('presskit'); return false;">Presskit</a>
     </div>
   </div>
   <div class="home-photo-side halftone" style="display:none;">
-    <img src="photos/IMG_0637.jpg" alt="LAZIZZE performing">
+    <img src="photos/IMG_0637.jpg" alt="Lazizze performing">
   </div>
   <div class="home-footer">
-    <span>HOUSE MUSIC</span>
-    <span>LAUSANNE</span>
+    <span>House music</span>
+    <span>Lausanne</span>
     <span>DJ</span>
-    <span>PINAELIOTT@GMAIL.COM</span>
+    <span>pinaeliott@gmail.com</span>
   </div>
 </div>
 
@@ -581,15 +594,21 @@
 <div id="page-about" class="page">
   <div class="inner-shell">
     <div class="inner-content">
-      <div class="pg-title"><h1>ABOUT</h1></div>
+      <div class="pg-head">
+        <div class="pg-title"><h1>About</h1></div>
+        <div class="pk-lang" data-lang-switch>
+          <button class="active" data-lang="EN" onclick="setLang('EN')">EN</button>
+          <button data-lang="FR" onclick="setLang('FR')">FR</button>
+        </div>
+      </div>
       <div class="marquee-strip">
         <div class="marquee-inner">
-          <span>CHICAGO — FRENCH TOUCH — OMAR S — JUSTICE — GROOVE — DANCEFLOOR — VINYL — LAUSANNE — 4AM SETS — HOUSE — DISCO — FUNK — SOUL — PACKED CLUBS — STEAMY WINDOWS — GOOD ENERGY — CHICAGO — FRENCH TOUCH — OMAR S — JUSTICE — GROOVE — DANCEFLOOR — VINYL — LAUSANNE — 4AM SETS — HOUSE — DISCO — FUNK — SOUL — PACKED CLUBS — STEAMY WINDOWS — GOOD ENERGY — CHICAGO — FRENCH TOUCH — OMAR S — JUSTICE — GROOVE — DANCEFLOOR — VINYL — LAUSANNE — 4AM SETS — HOUSE — DISCO — FUNK — SOUL — PACKED CLUBS — STEAMY WINDOWS — GOOD ENERGY —&nbsp;</span>
+          <span>Chicago — French Touch — Omar S — Justice — Groove — Dancefloor — Vinyl — Lausanne — 4am sets — House — Disco — Funk — Soul — Packed clubs — Steamy windows — Good energy — Chicago — French Touch — Omar S — Justice — Groove — Dancefloor — Vinyl — Lausanne — 4am sets — House — Disco — Funk — Soul — Packed clubs — Steamy windows — Good energy — Chicago — French Touch — Omar S — Justice — Groove — Dancefloor — Vinyl — Lausanne — 4am sets — House — Disco — Funk — Soul — Packed clubs — Steamy windows — Good energy —&nbsp;</span>
         </div>
       </div>
       <div class="about-hero">
         <div class="about-bio-main">
-          <p>LAZIZZE IS A HOUSE DJ FROM LAUSANNE WHO'S BEEN SOAKING UP NIGHTLIFE CULTURE FOR YEARS. ROOTED IN CHICAGO'S HERITAGE AND FUELED BY FRENCH TOUCH ENERGY, THE SOUND IS ALL ABOUT ONE THING: A GROOVE THAT KNOWS WHERE IT'S GOING.</p>
+          <p id="about-bio-main"></p>
         </div>
         <div class="about-photo halftone">
           <img src="photos/le-memo.png" alt="Le Memo">
@@ -597,31 +616,31 @@
       </div>
       <div class="about-bottom">
         <div class="about-bottom-left">
-          <p>NO GIMMICKS, NO FUSS — JUST THE URGENCY OF PACKED CLUBS, STEAMY WINDOWS, AND THOSE MOMENTS WHEN BODIES FORGET THEMSELVES ON THE DANCEFLOOR. 50+ DATES THIS YEAR, CHASING THAT TIPPING POINT WHERE THE SMILE BECOMES CONTAGIOUS AND THE RHYTHM TAKES OVER EVERYTHING ELSE.</p>
+          <p id="about-bio-secondary"></p>
         </div>
         <div class="about-details">
           <div class="about-detail" style="border-right:var(--b);border-bottom:var(--b)">
-            <span class="about-detail-lbl">BASED</span>
-            <span class="about-detail-val">LAUSANNE</span>
+            <span class="about-detail-lbl" id="ab-lbl-1">Based</span>
+            <span class="about-detail-val">Lausanne</span>
           </div>
           <div class="about-detail" style="border-bottom:var(--b)">
-            <span class="about-detail-lbl">SOUND</span>
-            <span class="about-detail-val">HOUSE / FRENCH TOUCH</span>
+            <span class="about-detail-lbl" id="ab-lbl-2">Sound</span>
+            <span class="about-detail-val">House / French Touch</span>
           </div>
           <div class="about-detail" style="border-right:var(--b)">
-            <span class="about-detail-lbl">INFLUENCES</span>
-            <span class="about-detail-val">CHICAGO / OMAR S / JUSTICE</span>
+            <span class="about-detail-lbl" id="ab-lbl-3">Influences</span>
+            <span class="about-detail-val">Chicago / Omar S / Justice</span>
           </div>
           <div class="about-detail">
             <span class="about-detail-lbl">2025</span>
-            <span class="about-detail-val">50+ DATES</span>
+            <span class="about-detail-val" id="ab-val-4">50+ dates</span>
           </div>
         </div>
       </div>
       <div class="about-socials">
-        <a href="https://instagram.com/lazizze" target="_blank" rel="noopener" class="about-social">INSTAGRAM</a>
-        <a href="https://soundcloud.com/lazizze" target="_blank" rel="noopener" class="about-social">SOUNDCLOUD</a>
-        <a href="#" class="about-social">RESIDENT ADVISOR</a>
+        <a href="https://www.lememo.ch/" target="_blank" rel="noopener" class="about-social">Le Memo</a>
+        <a href="https://instagram.com/lazizze" target="_blank" rel="noopener" class="about-social">Instagram</a>
+        <a href="https://www.youtube.com/@Lazizze.de_lala" target="_blank" rel="noopener" class="about-social">YouTube</a>
       </div>
     </div>
     <nav class="bottom-nav" data-nav="about"></nav>
@@ -632,15 +651,14 @@
 <div id="page-sounds" class="page">
   <div class="inner-shell">
     <div class="inner-content">
-      <div class="pg-title"><h1>SOUNDS</h1></div>
-      <div class="sounds-sub"><span>SELECTIONS &amp; FAVORITES — WHAT MOVES THE DANCEFLOOR</span></div>
+      <div class="pg-title"><h1>Track-ID</h1></div>
+      <div class="sounds-sub"><span id="sounds-sub-t">Selections &amp; favorites — what moves the dancefloor</span></div>
       <div class="sounds-body">
         <div class="sounds-body-left">
           <div id="tracks-box"></div>
-          <div class="sounds-cta"><span>MORE ON SOUNDCLOUD / MIXCLOUD</span></div>
         </div>
         <div class="sounds-photo-side halftone">
-          <img src="photos/IMG_2686 2.jpg" alt="Photo">
+          <img src="photos/IMG_2686%202.jpg" alt="">
         </div>
       </div>
     </div>
@@ -652,35 +670,35 @@
 <div id="page-presskit" class="page">
   <div class="inner-shell">
     <div class="inner-content">
-      <div class="pk-head">
-        <h1>PRESSKIT</h1>
-        <div class="pk-lang">
+      <div class="pg-head">
+        <div class="pg-title"><h1>Presskit</h1></div>
+        <div class="pk-lang" data-lang-switch>
           <button class="active" data-lang="EN" onclick="setLang('EN')">EN</button>
           <button data-lang="FR" onclick="setLang('FR')">FR</button>
         </div>
       </div>
-      <div class="pk-sub"><span id="pk-sub-t">FOR BOOKING AGENCIES &amp; PRESS — PREVIEW &amp; DOWNLOAD</span></div>
+      <div class="pk-sub"><span id="pk-sub-t"></span></div>
       <div class="pk-body">
         <div class="pk-left">
           <div class="pk-lbl">
-            <span id="pk-ph-lbl">PHOTOS — HI-RES (8)</span>
-            <button class="pk-lbl-btn" onclick="dlAll()">DOWNLOAD ALL</button>
+            <span id="pk-ph-lbl"></span>
+            <button class="pk-lbl-btn" onclick="dlAll()" id="pk-dlall-t">Download all</button>
           </div>
           <div class="pk-photos" id="pk-photos"></div>
           <div class="pk-see" onclick="togglePhotos()"><span id="pk-see-t"></span></div>
-          <div class="pk-lbl"><span id="pk-vid-lbl">VIDEOS (3)</span></div>
+          <div class="pk-lbl"><span id="pk-vid-lbl"></span></div>
           <div id="pk-vids"></div>
         </div>
         <div class="pk-right">
           <div class="pk-lbl">
-            <span id="pk-bio-lbl">BIOGRAPHY — EN</span>
-            <button class="pk-lbl-btn" onclick="dlBio()">↓ .TXT</button>
+            <span id="pk-bio-lbl"></span>
+            <button class="pk-lbl-btn" onclick="dlBio()">↓ .txt</button>
           </div>
           <div class="pk-bio"><p id="pk-bio-t"></p></div>
         </div>
       </div>
       <div class="pk-info" id="pk-info"></div>
-      <div class="pk-dl-strip" onclick="dlAll()"><span id="pk-dl-t">↓ DOWNLOAD FULL PRESSKIT</span></div>
+      <div class="pk-dl-strip" onclick="dlAll()"><span id="pk-dl-t"></span></div>
     </div>
     <nav class="bottom-nav" data-nav="presskit"></nav>
   </div>
@@ -695,8 +713,8 @@
       <div class="preview-bar">
         <span class="preview-lbl" id="pv-lbl"></span>
         <div class="preview-acts">
-          <button class="preview-dl" onclick="dlPvPhoto()">↓ DOWNLOAD</button>
-          <button class="preview-x" onclick="closePv()">✕ CLOSE</button>
+          <button class="preview-dl" onclick="dlPvPhoto()" id="pv-dl-t">↓ Download</button>
+          <button class="preview-x" onclick="closePv()" id="pv-close-t">✕ Close</button>
         </div>
       </div>
     </div>
@@ -706,41 +724,56 @@
 
 <script>
 const TRACKS = [
-  { id:1, title:"ONEONEONE", file:"songs/Oneoneone .mp3" },
-  { id:2, title:"TO THE MUSIC", file:"songs/TO THE MUSIC.mp3" },
-  { id:3, title:"JUSTICE & SIMIAN — WE ARE YOUR FRIENDS", file:"songs/Justice & Simian - We Are Your Friends (Justice Vs Simian).mp3" },
-  { id:4, title:"BIG STRICK & GENERATION NEXT — BANG MY SHIT", file:"songs/Big Strick & Generation Next - Bang My Shit.mp3" },
-  { id:5, title:"DJ ASSAULT & CRAIG DIAMONDS — U AIN'T ALL THAT", file:"songs/DJ Assault & Craig Diamonds - U Ain't All That.mp3" },
-  { id:6, title:"ED MOTTA — COLOMBINA", file:"songs/Ed Motta - Colombina.mp3" },
-  { id:7, title:"CRAZY P — STOP SPACE RETURN", file:"songs/Crazy P - Stop Space Return.mp3" },
-  { id:8, title:"THE GAP BAND — EARLY IN THE MORNING", file:"songs/The Gap Band - Early In The Morning.mp3" },
-  { id:9, title:"BUSY P — PROCRASTINATOR (HEY TODAY! REMIX)", file:"songs/Busy P - Procrastinator (Hey Today! Remix).mp3" },
-  { id:10, title:"TECHNOLOGIC (SPEEDY PALO EDIT)", file:"songs/Technologic (Speedy Palo Edit) 138 VF.aif" },
-  { id:11, title:"UNFINISHED BUSINESS", file:"songs/unfinished-business.mp3" },
-  { id:12, title:"KERRI CHANDLER — BROOKLYN FT. E-MAN", file:"songs/kerri-chandler-brooklyn-feat-e-man.mp3" },
+  { id:1, title:"Oneoneone", file:"songs/Oneoneone .mp3" },
+  { id:2, title:"To the music", file:"songs/TO THE MUSIC.mp3" },
+  { id:3, title:"Justice & Simian — We are your friends", file:"songs/Justice & Simian - We Are Your Friends (Justice Vs Simian).mp3" },
+  { id:4, title:"Big Strick & Generation Next — Bang my shit", file:"songs/Big Strick & Generation Next - Bang My Shit.mp3" },
+  { id:5, title:"DJ Assault & Craig Diamonds — U ain't all that", file:"songs/DJ Assault & Craig Diamonds - U Ain't All That.mp3" },
+  { id:6, title:"Ed Motta — Colombina", file:"songs/Ed Motta - Colombina.mp3" },
+  { id:7, title:"Crazy P — Stop space return", file:"songs/Crazy P - Stop Space Return.mp3" },
+  { id:8, title:"The Gap Band — Early in the morning", file:"songs/The Gap Band - Early In The Morning.mp3" },
+  { id:9, title:"Busy P — Procrastinator (Hey Today! remix)", file:"songs/Busy P - Procrastinator (Hey Today! Remix).mp3" },
+  { id:10, title:"Technologic (Speedy Palo edit)", file:"songs/Technologic (Speedy Palo Edit) 138 VF.aif" },
+  { id:11, title:"Unfinished business", file:"songs/unfinished-business.mp3" },
+  { id:12, title:"Kerri Chandler — Brooklyn ft. E-Man", file:"songs/kerri-chandler-brooklyn-feat-e-man.mp3" },
 ];
 
 const PHOTOS = [
-  { id:1, lbl:"PRESS PHOTO 01", src:"photos/IMG_2686 2.jpg" },
-  { id:2, lbl:"PRESS PHOTO 02", src:"photos/5b837873-e09c-4faf-bed6-292d6bcee1ad 2.JPG" },
-  { id:3, lbl:"PRESS PHOTO 03", src:"photos/IMG_6912.jpg" },
-  { id:4, lbl:"PRESS PHOTO 04", src:"photos/58b7b377-a1ee-4f3b-8d25-e8e8dd5ed3d9.jpg" },
-  { id:5, lbl:"PRESS PHOTO 05", src:"photos/0f47fab6-67ff-44f3-ac5a-c42605e29e4e.JPG" },
-  { id:6, lbl:"PRESS PHOTO 06", src:"photos/IMG_2122.jpg" },
+  { id:1, lbl:"Press photo 01", src:"photos/IMG_2686 2.jpg" },
+  { id:2, lbl:"Press photo 02", src:"photos/5b837873-e09c-4faf-bed6-292d6bcee1ad 2.JPG" },
+  { id:3, lbl:"Press photo 03", src:"photos/IMG_6912.jpg" },
+  { id:4, lbl:"Press photo 04", src:"photos/58b7b377-a1ee-4f3b-8d25-e8e8dd5ed3d9.jpg" },
+  { id:5, lbl:"Press photo 05", src:"photos/0f47fab6-67ff-44f3-ac5a-c42605e29e4e.JPG" },
+  { id:6, lbl:"Press photo 06", src:"photos/IMG_2122.jpg" },
 ];
 
 const VIDEOS = [
-  { id:1, lbl:"LAZIZZE — MIX 01", dur:"", type:"MIX", eid:"Mj4VYYxA4sE" },
-  { id:2, lbl:"LAZIZZE — MIX 02", dur:"", type:"MIX", eid:"-sXghBqprmo" },
-  { id:3, lbl:"LAZIZZE — MIX 03", dur:"", type:"MIX", eid:"ocSNGr3kcIY" },
+  { id:1, lbl:"Lazizze — Mix 01", dur:"", type:"Mix", eid:"Mj4VYYxA4sE" },
+  { id:2, lbl:"Lazizze — Mix 02", dur:"", type:"Mix", eid:"-sXghBqprmo" },
+  { id:3, lbl:"Lazizze — Mix 03", dur:"", type:"Mix", eid:"ocSNGr3kcIY" },
 ];
 
-const BIO = {
-  EN:"HOUSE DJ FROM LAUSANNE. ROOTED IN CHICAGO AND FUELED BY FRENCH TOUCH ENERGY. NO GIMMICKS — JUST PACKED CLUBS, STEAMY WINDOWS, AND THOSE MOMENTS WHEN THE RHYTHM TAKES OVER.",
-  FR:"DJ HOUSE ORIGINAIRE DE LAUSANNE. ENRACIN\u00c9 DANS CHICAGO ET PORT\u00c9 PAR L\u2019\u00c9NERGIE DE LA FRENCH TOUCH. PAS DE CHICHIS — JUSTE DES CLUBS BOND\u00c9S, LA BU\u00c9E SUR LES VITRES ET CES MOMENTS O\u00d9 LE RYTHME PREND LE CONTR\u00d4LE."
+const ABOUT_BIO = {
+  EN:"Hailing from Lausanne and a member of the Le Memo collective, Lazizze started by organizing underground events to fuel a rich and diverse local scene. It was this exact mission—the drive to create fresh, alternative parties—that pushed him to become a DJ. Tired of repetitive nights where the passion for dancing gets lost, he takes his role as a music seeker seriously. By hunting down hidden gems with contagious energy and a driving groove, he turns the dancefloor back into a space for pure pleasure and connection.",
+  FR:"Originaire de Lausanne et membre du collectif Le Memo, Lazizze s'est d'abord investi dans l'organisation d'événements underground pour soutenir une scène culturelle riche et variée. C'est précisément pour pousser cette vision plus loin et proposer des soirées vraiment nouvelles qu'il est devenu DJ. Lassé des nuits qui se ressemblent toutes où l'on oublie de lâcher prise, il prend ce rôle de chercheur de sons très au sérieux. Sa mission : dénicher des pépites à l'énergie contagieuse et au groove entraînant pour faire du dancefloor un espace où l'on prend un plaisir pur à bouger les uns à côté des autres."
 };
 
-let cur = 'home', playing = null, prog = {}, lang = 'EN', allPh = false, aVid = null, pvId = null;
+const ABOUT_SECONDARY = {
+  EN:"Nightlife is changing, and crowds are hungry for something more authentic. I don't understand why so many DJs just play the same hits everyone already knows, only louder. My approach is different: I believe in a scene where we take risks. My role is to offer something fresh, introducing new music and bringing the thrill of discovery back to the dancefloor.",
+  FR:"Le monde de la nuit change et le public a soif d'authenticité. Je ne comprends pas pourquoi tant de DJs se contentent de passer les mêmes morceaux que tout le monde connaît, mais juste plus fort. Ma démarche est différente : je crois en une scène où l'on prend le risque de la découverte. Mon rôle est de proposer quelque chose de nouveau, de montrer des sons inédits et de ramener le plaisir de la surprise sur le dancefloor."
+};
+
+const ABOUT_LABELS = {
+  EN:{ based:"Based", sound:"Sound", influences:"Influences", dates:"50+ dates" },
+  FR:{ based:"Basé à", sound:"Son", influences:"Influences", dates:"50+ dates" },
+};
+
+const BIO = {
+  EN:"Hailing from Lausanne, Lazizze brings an ultra-positive energy that he shares with the crowd, drawing from the spirit of 90s Chicago and the driving force of the French Touch. House, Electro, Rock... this digger hunts down musical gems you haven't heard yet to create a unique nightlife experience, dedicated to curious groovers. Forget the cameras, let the groove take over: this time, we dance for real!",
+  FR:"Originaire de Lausanne, Lazizze déploie une énergie ultra positive qu'il partage avec le public, puisant dans l'esprit de Chicago 90s et la force de la French Touch. House, Electro, Rock... ce digger cherche des pépites musicales que vous ne connaissez pas encore pour créer une nightlife inédite, dédiée aux kiffeurs curieux. Oubliez les caméras, laissez-vous porter par le groove, cette fois on danse pour de vrai !"
+};
+
+let cur = 'home', playing = null, prog = {}, lang = 'EN', allPh = false, aVid = VIDEOS[0]?.id ?? null, pvId = null;
 let audio = new Audio();
 audio.addEventListener('timeupdate', () => {
   if (playing && audio.duration) {
@@ -759,16 +792,16 @@ audio.addEventListener('ended', () => { playing = null; renderTracks(); });
 
 function navHTML(active) {
   const links = [
-    { h:'#/', l:'HOME', p:'home' },
-    { h:'#/about', l:'ABOUT', p:'about' },
-    { h:'#/sounds', l:'SOUNDS', p:'sounds' },
-    { h:'#/presskit', l:'PRESSKIT', p:'presskit' },
+    { h:'#/', l:'Home', p:'home' },
+    { h:'#/about', l:'About', p:'about' },
+    { h:'#/sounds', l:'Track-ID', p:'sounds' },
+    { h:'#/presskit', l:'Presskit', p:'presskit' },
   ];
   let s = '<div class="nav-links">';
   links.forEach(lk => {
     s += `<a href="${lk.h}" class="${lk.p===active?'active':''}" onclick="go('${lk.p}');return false;">${lk.l}</a>`;
   });
-  s += '</div><div class="nav-footer"><span>LAZIZZE &copy; 2026</span><span>ALL RIGHTS RESERVED</span></div>';
+  s += '</div><div class="nav-footer"><span>Lazizze &copy; 2026</span><span>All rights reserved</span></div>';
   return s;
 }
 
@@ -793,15 +826,28 @@ function onHash() {
 }
 window.addEventListener('hashchange', onHash);
 
+function canPlayFile(file) {
+  const ext = (file.split('.').pop() || '').toLowerCase();
+  if (ext === 'mp3' || ext === 'wav') return true;
+  if (ext === 'aif' || ext === 'aiff') {
+    return audio.canPlayType('audio/aiff') !== '' || audio.canPlayType('audio/x-aiff') !== '';
+  }
+  return audio.canPlayType('audio/' + ext) !== '';
+}
+
 function renderTracks() {
   const box = document.getElementById('tracks-box');
   let s = '';
   TRACKS.forEach((t, i) => {
     if (i === 6) {
-      s += `<div class="photo-break halftone"><img src="photos/IMG_2686 2.jpg" alt="Photo"></div>`;
+      s += `<div class="photo-break halftone"><img src="${encodeURI('photos/IMG_2686 2.jpg')}" alt=""></div>`;
     }
     const on = playing === t.id;
-    s += `<div class="trk ${on?'playing':''}" onclick="toggleTrk(${t.id})">
+    const ok = canPlayFile(t.file);
+    const cls = `trk ${on?'playing':''} ${ok?'':'unavailable'}`.replace(/\s+/g,' ').trim();
+    const click = ok ? `onclick="toggleTrk(${t.id})"` : '';
+    const ttl = ok ? '' : 'title="Format non lu par ce navigateur"';
+    s += `<div class="${cls}" ${click} ${ttl}>
       <div class="trk-inner">
         <div class="trk-play">${on?'II':'▶\uFE0E'}</div>
         <span class="trk-name">${t.title}</span>
@@ -817,7 +863,9 @@ function toggleTrk(id) {
   if (playing === id) { audio.pause(); playing = null; }
   else {
     const t = TRACKS.find(x => x.id === id);
-    if (t) { audio.src = t.file; audio.play(); }
+    if (!t || !canPlayFile(t.file)) { renderTracks(); return; }
+    audio.src = encodeURI(t.file);
+    audio.play().catch(() => { playing = null; renderTracks(); });
     playing = id; prog[id] = 0;
   }
   renderTracks();
@@ -825,8 +873,19 @@ function toggleTrk(id) {
 
 function setLang(l) {
   lang = l;
-  document.querySelectorAll('.pk-lang button').forEach(b => b.classList.toggle('active', b.dataset.lang === l));
+  document.querySelectorAll('[data-lang-switch] button').forEach(b => b.classList.toggle('active', b.dataset.lang === l));
   renderPK();
+  renderAbout();
+}
+
+function renderAbout() {
+  document.getElementById('about-bio-main').textContent = ABOUT_BIO[lang];
+  document.getElementById('about-bio-secondary').textContent = ABOUT_SECONDARY[lang];
+  const lb = ABOUT_LABELS[lang];
+  document.getElementById('ab-lbl-1').textContent = lb.based;
+  document.getElementById('ab-lbl-2').textContent = lb.sound;
+  document.getElementById('ab-lbl-3').textContent = lb.influences;
+  document.getElementById('ab-val-4').textContent = lb.dates;
 }
 
 function togglePhotos() { allPh = !allPh; renderPhotos(); }
@@ -834,18 +893,31 @@ function togglePhotos() { allPh = !allPh; renderPhotos(); }
 function renderPhotos() {
   const ph = allPh ? PHOTOS : PHOTOS.slice(0, 3);
   const grid = document.getElementById('pk-photos');
-  grid.style.gridTemplateColumns = `repeat(${ph.length}, 1fr)`;
+  const cols = Math.min(3, ph.length);
+  grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
   let s = '';
   ph.forEach((p, i) => {
-    s += `<div class="pk-photo-cell" style="${i<ph.length-1?'border-right:var(--b);':''}" onclick="openPv(${p.id})">
-      <div class="halftone" style="width:100%;height:100%"><img src="${p.src}" alt="${p.lbl}"></div>
-      <div class="pk-photo-ov"><span>${p.lbl}</span><button onclick="event.stopPropagation();dlFile('${p.src}','${p.lbl}')">↓ DL</button></div>
+    const inRow = i % cols;
+    const lastInRow = inRow === cols - 1;
+    const totalRows = Math.ceil(ph.length / cols);
+    const row = Math.floor(i / cols);
+    const isLastRow = row === totalRows - 1;
+    const cls = [
+      'pk-photo-cell',
+      lastInRow ? 'no-r' : '',
+      isLastRow ? '' : 'has-b',
+    ].filter(Boolean).join(' ');
+    const safeSrc = p.src.replace(/'/g, "\\'");
+    const safeLbl = p.lbl.replace(/'/g, "\\'");
+    s += `<div class="${cls}" onclick="openPv(${p.id})">
+      <div class="halftone" style="width:100%;height:100%"><img src="${encodeURI(p.src)}" alt="${p.lbl}" loading="lazy"></div>
+      <div class="pk-photo-ov"><span>${p.lbl}</span><button onclick="event.stopPropagation();dlFile('${safeSrc}','${safeLbl}')">↓ Dl</button></div>
     </div>`;
   });
   grid.innerHTML = s;
   document.getElementById('pk-see-t').textContent = allPh
-    ? (lang==='EN'?'▲ SHOW LESS':'▲ VOIR MOINS')
-    : (lang==='EN'?`▼ SEE ALL ${PHOTOS.length} PHOTOS`:`▼ VOIR LES ${PHOTOS.length} PHOTOS`);
+    ? (lang==='EN'?'▲ Show less':'▲ Voir moins')
+    : (lang==='EN'?`▼ See all ${PHOTOS.length} photos`:`▼ Voir les ${PHOTOS.length} photos`);
 }
 
 function renderVids() {
@@ -869,12 +941,12 @@ function renderVids() {
       s += `<div class="pk-vid-player">
         <div class="pk-vid-embed"><iframe src="https://www.youtube.com/embed/${v.eid}?autoplay=1&rel=0&modestbranding=1" allow="autoplay;encrypted-media" allowfullscreen></iframe></div>
         <div class="pk-vid-ctrl">
-          <button class="pk-vid-btn ${hasPrev?'':'disabled'}" onclick="event.stopPropagation();${hasPrev?`setVid(${VIDEOS[idx-1].id})`:''}"><span class="arr">‹</span><span class="lbl hide-sm">PREV</span></button>
+          <button class="pk-vid-btn ${hasPrev?'':'disabled'}" onclick="event.stopPropagation();${hasPrev?`setVid(${VIDEOS[idx-1].id})`:''}"><span class="arr">‹</span><span class="lbl hide-sm">Prev</span></button>
           <div class="pk-vid-mid">
             <span class="pk-vid-idx">${idx+1} / ${VIDEOS.length}</span>
-            <button class="pk-vid-open" onclick="event.stopPropagation();window.open('https://www.youtube.com/watch?v=${v.eid}','_blank')">↓ ${lang==='EN'?'DOWNLOAD / OPEN':'TÉLÉCHARGER / OUVRIR'}</button>
+            <button class="pk-vid-open" onclick="event.stopPropagation();window.open('https://www.youtube.com/watch?v=${v.eid}','_blank')">↓ ${lang==='EN'?'Download / Open':'Télécharger / Ouvrir'}</button>
           </div>
-          <button class="pk-vid-btn ${hasNext?'':'disabled'}" onclick="event.stopPropagation();${hasNext?`setVid(${VIDEOS[idx+1].id})`:''}"><span class="lbl hide-sm">NEXT</span><span class="arr">›</span></button>
+          <button class="pk-vid-btn ${hasNext?'':'disabled'}" onclick="event.stopPropagation();${hasNext?`setVid(${VIDEOS[idx+1].id})`:''}"><span class="lbl hide-sm">Next</span><span class="arr">›</span></button>
         </div>
       </div>`;
     }
@@ -887,19 +959,20 @@ function togVid(id) { aVid = aVid===id ? null : id; renderVids(); }
 function setVid(id) { aVid = id; renderVids(); }
 
 function renderPK() {
-  document.getElementById('pk-sub-t').innerHTML = lang==='EN'
-    ? 'FOR BOOKING AGENCIES &amp; PRESS — PREVIEW &amp; DOWNLOAD'
-    : 'POUR AGENCES DE BOOKING &amp; PRESSE — PRÉVISUALISER &amp; TÉLÉCHARGER';
-  document.getElementById('pk-ph-lbl').textContent = (lang==='EN'?'PHOTOS — HI-RES':'PHOTOS — HAUTE RÉSOLUTION')+` (${PHOTOS.length})`;
-  document.getElementById('pk-vid-lbl').textContent = (lang==='EN'?'VIDEOS':'VIDÉOS')+` (${VIDEOS.length})`;
-  document.getElementById('pk-bio-lbl').textContent = (lang==='EN'?'BIOGRAPHY':'BIOGRAPHIE')+` — ${lang}`;
+  document.getElementById('pk-sub-t').textContent = lang==='EN'
+    ? 'For booking agencies & press — preview & download'
+    : 'Pour agences de booking & presse — prévisualiser & télécharger';
+  document.getElementById('pk-ph-lbl').textContent = (lang==='EN'?'Photos — Hi-res':'Photos — Haute résolution')+` (${PHOTOS.length})`;
+  document.getElementById('pk-dlall-t').textContent = lang==='EN' ? 'Download all' : 'Tout télécharger';
+  document.getElementById('pk-vid-lbl').textContent = (lang==='EN'?'Videos':'Vidéos')+` (${VIDEOS.length})`;
+  document.getElementById('pk-bio-lbl').textContent = (lang==='EN'?'Biography':'Biographie')+` — ${lang}`;
   document.getElementById('pk-bio-t').textContent = BIO[lang];
-  document.getElementById('pk-dl-t').textContent = '↓ '+(lang==='EN'?'DOWNLOAD FULL PRESSKIT':'TÉLÉCHARGER LE PRESSKIT COMPLET');
+  document.getElementById('pk-dl-t').textContent = '↓ '+(lang==='EN'?'Download full presskit':'Télécharger le presskit complet');
   const info = [
-    { l:'GENRE', v:'HOUSE / FRENCH TOUCH' },
-    { l:lang==='EN'?'BASED':'BASÉ À', v:'LAUSANNE, CH' },
-    { l:'BOOKING', v:'PINAELIOTT@GMAIL.COM' },
-    { l:'INSTAGRAM', v:'@LAZIZZE' },
+    { l:'Genre', v:'House / French Touch' },
+    { l:lang==='EN'?'Based':'Basé à', v:'Lausanne, CH' },
+    { l:'Booking', v:'pinaeliott@gmail.com' },
+    { l:'Instagram', v:'@lazizze' },
   ];
   let h = '';
   info.forEach((it, i) => {
@@ -912,21 +985,29 @@ function renderPK() {
   renderVids();
 }
 
-function openPv(id) { pvId=id; updPv(); document.getElementById('preview').classList.add('on'); }
-function closePv() { pvId=null; document.getElementById('preview').classList.remove('on'); }
+function openPv(id) { pvId=id; updPv(); document.getElementById('preview').classList.add('on'); document.body.style.overflow='hidden'; }
+function closePv() { pvId=null; document.getElementById('preview').classList.remove('on'); document.body.style.overflow=''; }
 function navPv(d) {
-  const ph = allPh?PHOTOS:PHOTOS.slice(0,3);
-  const idx = ph.findIndex(p=>p.id===pvId)+d;
-  if (idx>=0 && idx<ph.length) { pvId=ph[idx].id; updPv(); }
+  const cur = PHOTOS.findIndex(p=>p.id===pvId);
+  if (cur<0) return;
+  const idx = cur+d;
+  if (idx>=0 && idx<PHOTOS.length) { pvId=PHOTOS[idx].id; updPv(); }
 }
 function updPv() {
-  const ph = allPh?PHOTOS:PHOTOS.slice(0,3);
-  const p = PHOTOS.find(x=>x.id===pvId), idx = ph.findIndex(x=>x.id===pvId);
-  document.getElementById('pv-img').src = p.src;
-  document.getElementById('pv-lbl').textContent = `${p.lbl} — ${idx+1}/${ph.length}`;
-  document.getElementById('pv-prev').classList.toggle('off', idx===0);
-  document.getElementById('pv-next').classList.toggle('off', idx===ph.length-1);
+  const p = PHOTOS.find(x=>x.id===pvId);
+  if (!p) return;
+  const idx = PHOTOS.findIndex(x=>x.id===pvId);
+  document.getElementById('pv-img').src = encodeURI(p.src);
+  document.getElementById('pv-lbl').textContent = `${p.lbl} — ${idx+1}/${PHOTOS.length}`;
+  document.getElementById('pv-prev').classList.toggle('off', idx<=0);
+  document.getElementById('pv-next').classList.toggle('off', idx===PHOTOS.length-1);
 }
+document.addEventListener('keydown', (e) => {
+  if (!document.getElementById('preview').classList.contains('on')) return;
+  if (e.key === 'Escape') { closePv(); }
+  else if (e.key === 'ArrowLeft') { navPv(-1); }
+  else if (e.key === 'ArrowRight') { navPv(1); }
+});
 function dlPvPhoto() { const p=PHOTOS.find(x=>x.id===pvId); if(p) dlFile(p.src,p.lbl); }
 
 function dlFile(url, name) {
@@ -942,6 +1023,7 @@ function dlBio() {
 
 renderTracks();
 renderPK();
+renderAbout();
 updNav();
 onHash();
 </script>
