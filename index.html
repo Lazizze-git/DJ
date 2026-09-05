@@ -150,7 +150,8 @@
       .about-hero { display: flex; }
       .about-bio-main { flex: 1; }
       .about-hero .about-photo { width: 35%; min-width: 280px; height: auto; border-left: var(--b); }
-      .about-hero .about-photo img { height: 100%; }
+      /* la photo remplit la colonne sans imposer sa hauteur au bloc */
+      .about-hero .about-photo img { position: absolute; inset: 0; height: 100%; }
     }
     .about-bio-main { padding: 4vw 3vw; }
     .about-bio-main p {
@@ -161,6 +162,8 @@
     }
 
     .about-photo { height: clamp(120px, 20vw, 220px); border-bottom: var(--b); }
+    /* photo de club sous-exposée : on remonte la luminosité pour le rendu halftone */
+    .about-photo img { object-position: center 20%; filter: grayscale(100%) contrast(1.15) brightness(1.7); }
     @media (min-width: 768px) {
       .about-photo { height: auto; border-bottom: none; }
     }
@@ -187,7 +190,7 @@
     }
 
     .about-socials {
-      display: grid; grid-template-columns: 1fr 1fr 1fr;
+      display: grid; grid-auto-flow: column; grid-auto-columns: 1fr;
       border-top: var(--b); border-bottom: var(--b);
     }
     .about-social {
@@ -583,7 +586,7 @@
     <img src="photos/IMG_0637.jpg" alt="Lazizze performing">
   </div>
   <div class="home-footer">
-    <span>House music</span>
+    <span>Electro &amp; disco</span>
     <span>Lausanne</span>
     <span>DJ</span>
     <span>pinaeliott@gmail.com</span>
@@ -603,7 +606,7 @@
       </div>
       <div class="marquee-strip">
         <div class="marquee-inner">
-          <span>Chicago — French Touch — Omar S — Justice — Groove — Dancefloor — Vinyl — Lausanne — 4am sets — House — Disco — Funk — Soul — Packed clubs — Steamy windows — Good energy — Chicago — French Touch — Omar S — Justice — Groove — Dancefloor — Vinyl — Lausanne — 4am sets — House — Disco — Funk — Soul — Packed clubs — Steamy windows — Good energy — Chicago — French Touch — Omar S — Justice — Groove — Dancefloor — Vinyl — Lausanne — 4am sets — House — Disco — Funk — Soul — Packed clubs — Steamy windows — Good energy —&nbsp;</span>
+          <span>Electro — Disco — Justice — Joey Negro — Inner Life — House — Groove — Vinyl — Lausanne — Dancefloor — Electro — Disco — Justice — Joey Negro — Inner Life — House — Groove — Vinyl — Lausanne — Dancefloor — Electro — Disco — Justice — Joey Negro — Inner Life — House — Groove — Vinyl — Lausanne — Dancefloor — &nbsp;</span>
         </div>
       </div>
       <div class="about-hero">
@@ -611,7 +614,7 @@
           <p id="about-bio-main"></p>
         </div>
         <div class="about-photo halftone">
-          <img src="photos/le-memo.png" alt="Le Memo">
+          <img src="photos/58b7b377-a1ee-4f3b-8d25-e8e8dd5ed3d9.jpg" alt="Lazizze aux platines">
         </div>
       </div>
       <div class="about-bottom">
@@ -625,11 +628,11 @@
           </div>
           <div class="about-detail" style="border-bottom:var(--b)">
             <span class="about-detail-lbl" id="ab-lbl-2">Sound</span>
-            <span class="about-detail-val">House / French Touch</span>
+            <span class="about-detail-val">Electro / Disco</span>
           </div>
           <div class="about-detail" style="border-right:var(--b)">
             <span class="about-detail-lbl" id="ab-lbl-3">Influences</span>
-            <span class="about-detail-val">Chicago / Omar S / Justice</span>
+            <span class="about-detail-val">Justice / Joey Negro / Inner Life</span>
           </div>
           <div class="about-detail">
             <span class="about-detail-lbl">2025</span>
@@ -638,7 +641,6 @@
         </div>
       </div>
       <div class="about-socials">
-        <a href="https://www.lememo.ch/" target="_blank" rel="noopener" class="about-social">Le Memo</a>
         <a href="https://instagram.com/lazizze" target="_blank" rel="noopener" class="about-social">Instagram</a>
         <a href="https://www.youtube.com/@Lazizze.de_lala" target="_blank" rel="noopener" class="about-social">YouTube</a>
       </div>
@@ -652,7 +654,7 @@
   <div class="inner-shell">
     <div class="inner-content">
       <div class="pg-title"><h1>Track-ID</h1></div>
-      <div class="sounds-sub"><span id="sounds-sub-t">Selections &amp; favorites — what moves the dancefloor</span></div>
+      <div class="sounds-sub"><span id="sounds-sub-t">A few tracks I like to play</span></div>
       <div class="sounds-body">
         <div class="sounds-body-left">
           <div id="tracks-box"></div>
@@ -754,13 +756,13 @@ const VIDEOS = [
 ];
 
 const ABOUT_BIO = {
-  EN:"Hailing from Lausanne and a member of the Le Memo collective, Lazizze started by organizing underground events to fuel a rich and diverse local scene. It was this exact mission—the drive to create fresh, alternative parties—that pushed him to become a DJ. Tired of repetitive nights where the passion for dancing gets lost, he takes his role as a music seeker seriously. By hunting down hidden gems with contagious energy and a driving groove, he turns the dancefloor back into a space for pure pleasure and connection.",
-  FR:"Originaire de Lausanne et membre du collectif Le Memo, Lazizze s'est d'abord investi dans l'organisation d'événements underground pour soutenir une scène culturelle riche et variée. C'est précisément pour pousser cette vision plus loin et proposer des soirées vraiment nouvelles qu'il est devenu DJ. Lassé des nuits qui se ressemblent toutes où l'on oublie de lâcher prise, il prend ce rôle de chercheur de sons très au sérieux. Sa mission : dénicher des pépites à l'énergie contagieuse et au groove entraînant pour faire du dancefloor un espace où l'on prend un plaisir pur à bouger les uns à côté des autres."
+  EN:"I'm a DJ based in Lausanne. I started out putting on parties, then wanted to play the records myself. What I love is electronic music with real dancing energy — Justice, Joey Negro, Inner Life — and disco with an electro edge. I spend a lot of time digging for tracks, and I play them so people dance.",
+  FR:"Je suis DJ à Lausanne. J'ai commencé par organiser des soirées, puis j'ai eu envie de passer les disques moi-même. Ce que j'aime, c'est la musique électronique avec une vraie énergie dansante — Justice, Joey Negro, Inner Life — et le disco aux sonorités électro. Je passe beaucoup de temps à chercher des morceaux, et je les joue pour qu'on danse."
 };
 
 const ABOUT_SECONDARY = {
-  EN:"Nightlife is changing, and crowds are hungry for something more authentic. I don't understand why so many DJs just play the same hits everyone already knows, only louder. My approach is different: I believe in a scene where we take risks. My role is to offer something fresh, introducing new music and bringing the thrill of discovery back to the dancefloor.",
-  FR:"Le monde de la nuit change et le public a soif d'authenticité. Je ne comprends pas pourquoi tant de DJs se contentent de passer les mêmes morceaux que tout le monde connaît, mais juste plus fort. Ma démarche est différente : je crois en une scène où l'on prend le risque de la découverte. Mon rôle est de proposer quelque chose de nouveau, de montrer des sons inédits et de ramener le plaisir de la surprise sur le dancefloor."
+  EN:"I'd rather play tracks people haven't heard than the same hits as everyone else. When a record nobody knows gets the room moving, that's exactly what I'm after.",
+  FR:"Je préfère faire découvrir des morceaux plutôt que rejouer ce que tout le monde connaît déjà. Quand un disque que personne n'a entendu fait bouger la salle, c'est exactement ce que je cherche."
 };
 
 const ABOUT_LABELS = {
@@ -769,8 +771,8 @@ const ABOUT_LABELS = {
 };
 
 const BIO = {
-  EN:"Hailing from Lausanne, Lazizze brings an ultra-positive energy that he shares with the crowd, drawing from the spirit of 90s Chicago and the driving force of the French Touch. House, Electro, Rock... this digger hunts down musical gems you haven't heard yet to create a unique nightlife experience, dedicated to curious groovers. Forget the cameras, let the groove take over: this time, we dance for real!",
-  FR:"Originaire de Lausanne, Lazizze déploie une énergie ultra positive qu'il partage avec le public, puisant dans l'esprit de Chicago 90s et la force de la French Touch. House, Electro, Rock... ce digger cherche des pépites musicales que vous ne connaissez pas encore pour créer une nightlife inédite, dédiée aux kiffeurs curieux. Oubliez les caméras, laissez-vous porter par le groove, cette fois on danse pour de vrai !"
+  EN:"Lazizze is a DJ based in Lausanne. He plays electronic music with real dancing energy — somewhere between Justice, Joey Negro and Inner Life — along with disco that leans electro. Tracks you probably don't know yet, played to keep the floor moving.",
+  FR:"Lazizze est DJ à Lausanne. Il joue de la musique électronique avec une vraie énergie dansante — quelque part entre Justice, Joey Negro et Inner Life — et du disco aux sonorités électro. Des morceaux qu'on ne connaît pas encore, joués pour faire danser."
 };
 
 let cur = 'home', playing = null, prog = {}, lang = 'EN', allPh = false, aVid = VIDEOS[0]?.id ?? null, pvId = null;
@@ -969,7 +971,7 @@ function renderPK() {
   document.getElementById('pk-bio-t').textContent = BIO[lang];
   document.getElementById('pk-dl-t').textContent = '↓ '+(lang==='EN'?'Download full presskit':'Télécharger le presskit complet');
   const info = [
-    { l:'Genre', v:'House / French Touch' },
+    { l:'Genre', v:'Electro / Disco' },
     { l:lang==='EN'?'Based':'Basé à', v:'Lausanne, CH' },
     { l:'Booking', v:'pinaeliott@gmail.com' },
     { l:'Instagram', v:'@lazizze' },

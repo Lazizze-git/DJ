@@ -1,0 +1,31 @@
+# ---- Page d'accueil ----
+DirectoryIndex index.html
+
+# ---- Ne jamais afficher la liste des fichiers du serveur ----
+Options -Indexes
+
+# ---- Bloquer l'accès aux fichiers techniques ----
+<FilesMatch "\.(json|mjs|md|yml|lock)$">
+  Require all denied
+</FilesMatch>
+
+# ---- Bloquer les anciens dossiers de travail restés sur le serveur ----
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteRule ^Portfolio\ site\ design/ - [F,L]
+  RewriteRule ^node_modules/ - [F,L]
+</IfModule>
+
+# ---- Compression (le site est un seul gros fichier HTML) ----
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css text/plain application/javascript image/svg+xml
+</IfModule>
+
+# ---- Cache navigateur pour les médias ----
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType image/jpeg "access plus 1 month"
+  ExpiresByType image/png  "access plus 1 month"
+  ExpiresByType audio/mpeg "access plus 1 month"
+  ExpiresByType text/html  "access plus 0 seconds"
+</IfModule>
