@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>LAZIZZE — DJ</title>
+  <meta name="description" content="Lazizze, DJ à Lausanne — electro et disco. Écoute, presskit et contact booking.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23FF007F'/%3E%3Ctext x='50' y='50' font-family='Helvetica,Arial,sans-serif' font-size='80' font-weight='bold' fill='%23000' text-anchor='middle' dominant-baseline='central'%3EL%3C/text%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter+Tight:wght@400;500;700;900&display=swap" rel="stylesheet">
@@ -654,7 +656,7 @@
   <div class="inner-shell">
     <div class="inner-content">
       <div class="pg-title"><h1>Track-ID</h1></div>
-      <div class="sounds-sub"><span id="sounds-sub-t">A few tracks I like to play</span></div>
+      <div class="sounds-sub"><span id="sounds-sub-t">A few tracks I like to play — 45s previews</span></div>
       <div class="sounds-body">
         <div class="sounds-body-left">
           <div id="tracks-box"></div>
@@ -726,18 +728,18 @@
 
 <script>
 const TRACKS = [
-  { id:1, title:"Oneoneone", file:"songs/Oneoneone .mp3" },
-  { id:2, title:"To the music", file:"songs/TO THE MUSIC.mp3" },
-  { id:3, title:"Justice & Simian — We are your friends", file:"songs/Justice & Simian - We Are Your Friends (Justice Vs Simian).mp3" },
-  { id:4, title:"Big Strick & Generation Next — Bang my shit", file:"songs/Big Strick & Generation Next - Bang My Shit.mp3" },
-  { id:5, title:"DJ Assault & Craig Diamonds — U ain't all that", file:"songs/DJ Assault & Craig Diamonds - U Ain't All That.mp3" },
-  { id:6, title:"Ed Motta — Colombina", file:"songs/Ed Motta - Colombina.mp3" },
-  { id:7, title:"Crazy P — Stop space return", file:"songs/Crazy P - Stop Space Return.mp3" },
-  { id:8, title:"The Gap Band — Early in the morning", file:"songs/The Gap Band - Early In The Morning.mp3" },
-  { id:9, title:"Busy P — Procrastinator (Hey Today! remix)", file:"songs/Busy P - Procrastinator (Hey Today! Remix).mp3" },
-  { id:10, title:"Technologic (Speedy Palo edit)", file:"songs/Technologic (Speedy Palo Edit) 138 VF.aif" },
-  { id:11, title:"Unfinished business", file:"songs/unfinished-business.mp3" },
-  { id:12, title:"Kerri Chandler — Brooklyn ft. E-Man", file:"songs/kerri-chandler-brooklyn-feat-e-man.mp3" },
+  { id:1, title:"Oneoneone", file:"songs/Oneoneone .m4a" },
+  { id:2, title:"To the music", file:"songs/TO THE MUSIC.m4a" },
+  { id:3, title:"Justice & Simian — We are your friends", file:"songs/Justice & Simian - We Are Your Friends (Justice Vs Simian).m4a" },
+  { id:4, title:"Big Strick & Generation Next — Bang my shit", file:"songs/Big Strick & Generation Next - Bang My Shit.m4a" },
+  { id:5, title:"DJ Assault & Craig Diamonds — U ain't all that", file:"songs/DJ Assault & Craig Diamonds - U Ain't All That.m4a" },
+  { id:6, title:"Ed Motta — Colombina", file:"songs/Ed Motta - Colombina.m4a" },
+  { id:7, title:"Crazy P — Stop space return", file:"songs/Crazy P - Stop Space Return.m4a" },
+  { id:8, title:"The Gap Band — Early in the morning", file:"songs/The Gap Band - Early In The Morning.m4a" },
+  { id:9, title:"Busy P — Procrastinator (Hey Today! remix)", file:"songs/Busy P - Procrastinator (Hey Today! Remix).m4a" },
+  { id:10, title:"Technologic (Speedy Palo edit)", file:"songs/Technologic (Speedy Palo Edit) 138 VF.m4a" },
+  { id:11, title:"Unfinished business", file:"songs/unfinished-business.m4a" },
+  { id:12, title:"Kerri Chandler — Brooklyn ft. E-Man", file:"songs/kerri-chandler-brooklyn-feat-e-man.m4a" },
 ];
 
 const PHOTOS = [
@@ -831,8 +833,8 @@ window.addEventListener('hashchange', onHash);
 function canPlayFile(file) {
   const ext = (file.split('.').pop() || '').toLowerCase();
   if (ext === 'mp3' || ext === 'wav') return true;
-  if (ext === 'aif' || ext === 'aiff') {
-    return audio.canPlayType('audio/aiff') !== '' || audio.canPlayType('audio/x-aiff') !== '';
+  if (ext === 'm4a' || ext === 'aac' || ext === 'mp4') {
+    return audio.canPlayType('audio/mp4; codecs="mp4a.40.2"') !== '';
   }
   return audio.canPlayType('audio/' + ext) !== '';
 }
@@ -964,7 +966,7 @@ function renderPK() {
   document.getElementById('pk-sub-t').textContent = lang==='EN'
     ? 'For booking agencies & press — preview & download'
     : 'Pour agences de booking & presse — prévisualiser & télécharger';
-  document.getElementById('pk-ph-lbl').textContent = (lang==='EN'?'Photos — Hi-res':'Photos — Haute résolution')+` (${PHOTOS.length})`;
+  document.getElementById('pk-ph-lbl').textContent = (lang==='EN'?'Photos':'Photos')+` (${PHOTOS.length})`;
   document.getElementById('pk-dlall-t').textContent = lang==='EN' ? 'Download all' : 'Tout télécharger';
   document.getElementById('pk-vid-lbl').textContent = (lang==='EN'?'Videos':'Vidéos')+` (${VIDEOS.length})`;
   document.getElementById('pk-bio-lbl').textContent = (lang==='EN'?'Biography':'Biographie')+` — ${lang}`;
