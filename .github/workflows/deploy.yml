@@ -24,8 +24,6 @@ jobs:
           port: 21
           # Nom changé : force un envoi complet du site au prochain déploiement
           state-name: .deploy-state-v2.json
-          # Vide le serveur avant l'envoi (l'espace de 10 Mo était saturé)
-          dangerous-clean-slate: true
           # Fichiers de travail qui n'ont rien à faire en ligne
           exclude: |
             **/.git*
