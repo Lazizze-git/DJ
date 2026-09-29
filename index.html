@@ -825,9 +825,13 @@ const PHOTOS = [
 
 // Peintures : [largeur, hauteur] de la grande version, pour réserver la place avant chargement
 const RANDOM_SIZES = [[2000,1369],[1393,2000],[1207,2000],[1360,2000],[1441,2000],[2000,1369],[2000,1308],[2000,1397],[2000,1745],[2000,1660],[2000,1209],[2000,1359],[856,596],[939,656],[1024,768],[2000,1500],[2000,1500],[962,1289]];
+// En ligne, les peintures sont servies par jsDelivr (copie du dépôt GitHub) : l'hébergement
+// Infomaniak est limité en place. En local, on lit les fichiers du dossier.
+const IS_LOCAL = location.protocol === 'file:' || ['localhost', '127.0.0.1'].includes(location.hostname);
+const RANDOM_DIR = IS_LOCAL ? 'photos/random' : 'https://cdn.jsdelivr.net/gh/Lazizze-git/DJ@main/photos/random';
 const RANDOM = RANDOM_SIZES.map(([w, h], i) => {
   const n = String(i + 1).padStart(2, '0');
-  return { id: i + 1, lbl: `Random ${n}`, src: `photos/random/random-${n}.webp`, thumb: `photos/random/random-${n}-sm.webp`, w, h };
+  return { id: i + 1, lbl: `Random ${n}`, src: `${RANDOM_DIR}/random-${n}.webp`, thumb: `${RANDOM_DIR}/random-${n}-sm.webp`, w, h };
 });
 
 const GALLERIES = {

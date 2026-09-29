@@ -38,3 +38,5 @@ jobs:
             **/.DS_Store
             **/*.HEIC
             **/*.heic
+            # Peintures servies par jsDelivr (voir RANDOM_DIR dans index.html)
+            **/photos/random/**
