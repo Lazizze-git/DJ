@@ -478,10 +478,58 @@
       color: var(--pk); text-transform: uppercase; letter-spacing: 0.15em;
     }
 
+    /* PRESSKIT — APERÇU RANDOM */
+    .pk-rnd {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      border-bottom: var(--b); cursor: pointer; background: var(--bk);
+    }
+    .pk-rnd-cell { aspect-ratio: 1 / 1; overflow: hidden; border-right: var(--b); }
+    .pk-rnd-cell:last-child { border-right: none; }
+    .pk-rnd-cell img {
+      width: 100%; height: 100%; object-fit: cover; display: block;
+      transition: transform 0.4s ease;
+    }
+    .pk-rnd:hover .pk-rnd-cell img { transform: scale(1.04); }
+    .pk-rnd-go { background: var(--bk); }
+    .pk-rnd-go span { color: var(--pk); }
+
+    /* RANDOM — PAGE PEINTURES */
+    .rnd-back {
+      font-family: var(--m); font-weight: 700; cursor: pointer;
+      font-size: clamp(0.5rem, 0.8vw, 0.65rem);
+      text-transform: uppercase; letter-spacing: 0.08em;
+      padding: 4px 10px; border: 3px solid var(--bk);
+      background: transparent; color: var(--bk);
+      margin-bottom: 10px; flex-shrink: 0; text-decoration: none;
+      transition: opacity 0.12s ease;
+    }
+    .rnd-back:hover { opacity: 0.7; }
+    .rnd-grid { columns: 1; column-gap: 3vw; padding: 3vw; }
+    @media (min-width: 600px) { .rnd-grid { columns: 2; } }
+    @media (min-width: 1100px) { .rnd-grid { columns: 3; column-gap: 2vw; padding: 2vw 3vw; } }
+    .rnd-item {
+      break-inside: avoid; margin: 0 0 3vw; cursor: zoom-in;
+      border: var(--b); background: var(--bk);
+    }
+    @media (min-width: 1100px) { .rnd-item { margin-bottom: 2vw; } }
+    .rnd-item img {
+      width: 100%; height: auto; display: block;
+      transition: opacity 0.2s ease;
+    }
+    .rnd-item:hover img { opacity: 0.85; }
+    .rnd-item:focus-visible { outline: 3px solid var(--bk); outline-offset: 3px; }
+    .rnd-cap {
+      display: flex; justify-content: space-between;
+      padding: 6px 10px; border-top: var(--b);
+      font-family: var(--m); font-weight: 700;
+      font-size: clamp(0.5rem, 0.75vw, 0.6rem); color: var(--pk);
+      text-transform: uppercase; letter-spacing: 0.12em;
+    }
+
     /* PHOTO PREVIEW */
     .preview { position: fixed; inset: 0; z-index: 10000; display: none; align-items: center; justify-content: center; background: rgba(0,0,0,0.94); }
     .preview.on { display: flex; }
-    .preview-wrap { display: flex; align-items: center; width: 95vw; max-width: 1000px; }
+    .preview-wrap { display: flex; align-items: center; width: 95vw; max-width: 1400px; }
     .preview-nav {
       flex-shrink: 0; width: 44px; height: 44px; cursor: pointer;
       background: var(--bk); border: 3px solid var(--pk);
@@ -491,8 +539,9 @@
     }
     .preview-nav.off { opacity: 0.2; pointer-events: none; }
     .preview-center { flex: 1; margin: 0 12px; min-width: 0; }
-    .preview-img-box { border: 3px solid var(--pk); }
-    .preview-img-box img { width: 100%; display: block; max-height: 65vh; object-fit: cover; }
+    .preview-img-box { border: 3px solid var(--pk); background: var(--bk); display: flex; justify-content: center; }
+    /* l'image s'affiche en entier, jamais recadrée */
+    .preview-img-box img { display: block; max-width: 100%; max-height: 78vh; width: auto; height: auto; object-fit: contain; }
     .preview-bar {
       display: flex; align-items: center; justify-content: space-between;
       padding: 8px 12px; background: var(--bk);
@@ -516,6 +565,11 @@
       border: 3px solid var(--pk); padding: 3px 10px; text-transform: uppercase; letter-spacing: 0.08em;
     }
     .preview-x:hover { opacity: 0.8; }
+    @media (max-width: 600px) {
+      .preview-wrap { width: 100vw; }
+      .preview-nav { width: 32px; height: 44px; font-size: 1.2rem; }
+      .preview-center { margin: 0 4px; }
+    }
 
     /* RESPONSIVE */
     .hide-sm { display: none; }
@@ -691,8 +745,8 @@
           <div class="pk-photos" id="pk-press"></div>
           <div class="pk-see" onclick="toggleGallery('press')"><span id="pk-see-press"></span></div>
           <div class="pk-lbl"><span id="pk-rnd-lbl"></span></div>
-          <div class="pk-photos" id="pk-random"></div>
-          <div class="pk-see" onclick="toggleGallery('random')"><span id="pk-see-random"></span></div>
+          <div class="pk-rnd" id="pk-random" onclick="go('random')" role="link" tabindex="0" onkeydown="if(event.key==='Enter')go('random')"></div>
+          <div class="pk-see pk-rnd-go" onclick="go('random')"><span id="pk-see-random"></span></div>
           <div class="pk-lbl"><span id="pk-vid-lbl"></span></div>
           <div id="pk-vids"></div>
         </div>
@@ -708,6 +762,21 @@
       <div class="pk-dl-strip" onclick="dlAll()"><span id="pk-dl-t"></span></div>
     </div>
     <nav class="bottom-nav" data-nav="presskit"></nav>
+  </div>
+</div>
+
+<!-- RANDOM -->
+<div id="page-random" class="page">
+  <div class="inner-shell">
+    <div class="inner-content">
+      <div class="pg-head">
+        <div class="pg-title"><h1>Random</h1></div>
+        <a class="rnd-back" href="#/presskit" onclick="go('presskit');return false;" id="rnd-back-t">← Presskit</a>
+      </div>
+      <div class="pk-sub"><span id="rnd-sub-t"></span></div>
+      <div class="rnd-grid" id="rnd-grid"></div>
+    </div>
+    <nav class="bottom-nav" data-nav="random"></nav>
   </div>
 </div>
 
@@ -754,14 +823,16 @@ const PHOTOS = [
   { id:6, lbl:"Press photo 06", src:"photos/IMG_2122.jpg" },
 ];
 
-const RANDOM = Array.from({ length: 18 }, (_, i) => {
+// Peintures : [largeur, hauteur] de la grande version, pour réserver la place avant chargement
+const RANDOM_SIZES = [[2000,1369],[1393,2000],[1207,2000],[1360,2000],[1441,2000],[2000,1369],[2000,1308],[2000,1397],[2000,1745],[2000,1660],[2000,1209],[2000,1359],[856,596],[939,656],[1024,768],[2000,1500],[2000,1500],[962,1289]];
+const RANDOM = RANDOM_SIZES.map(([w, h], i) => {
   const n = String(i + 1).padStart(2, '0');
-  return { id: i + 1, lbl: `Random ${n}`, src: `photos/random/random-${n}.jpg` };
+  return { id: i + 1, lbl: `Random ${n}`, src: `photos/random/random-${n}.webp`, thumb: `photos/random/random-${n}-sm.webp`, w, h };
 });
 
 const GALLERIES = {
   press: { items: PHOTOS, gridId: 'pk-press', seeId: 'pk-see-press', open: false },
-  random: { items: RANDOM, gridId: 'pk-random', seeId: 'pk-see-random', open: false },
+  random: { items: RANDOM },
 };
 
 const VIDEOS = [
@@ -838,7 +909,7 @@ function go(p) {
 
 function onHash() {
   const h = (window.location.hash || '#/').replace('#/', '') || 'home';
-  if (['home','about','sounds','presskit'].includes(h)) go(h); else go('home');
+  if (['home','about','sounds','presskit','random'].includes(h)) go(h); else go('home');
 }
 window.addEventListener('hashchange', onHash);
 
@@ -938,6 +1009,27 @@ function renderGallery(key) {
     : (lang==='EN'?`▼ See all ${n} photos`:`▼ Voir les ${n} photos`);
 }
 
+function renderRandomTeaser() {
+  document.getElementById('pk-random').innerHTML = RANDOM.slice(0, 3).map(p =>
+    `<div class="pk-rnd-cell"><img src="${p.thumb}" alt="${p.lbl}" loading="lazy"></div>`
+  ).join('');
+  document.getElementById('pk-see-random').textContent = lang==='EN'
+    ? `→ See the ${RANDOM.length} paintings`
+    : `→ Voir les ${RANDOM.length} peintures`;
+}
+
+function renderRandomPage() {
+  document.getElementById('rnd-sub-t').textContent = lang==='EN'
+    ? `Paintings — ${RANDOM.length} works — click to enlarge`
+    : `Peintures — ${RANDOM.length} œuvres — cliquer pour agrandir`;
+  document.getElementById('rnd-grid').innerHTML = RANDOM.map((p, i) =>
+    `<figure class="rnd-item" tabindex="0" onclick="openPv('random',${p.id})" onkeydown="if(event.key==='Enter')openPv('random',${p.id})">
+      <img src="${p.thumb}" width="${p.w}" height="${p.h}" alt="${p.lbl}" loading="${i < 3 ? 'eager' : 'lazy'}" decoding="async">
+      <figcaption class="rnd-cap"><span>${p.lbl}</span><span>${String(i + 1).padStart(2, '0')} / ${RANDOM.length}</span></figcaption>
+    </figure>`
+  ).join('');
+}
+
 function renderVids() {
   const box = document.getElementById('pk-vids');
   let s = '';
@@ -981,7 +1073,7 @@ function renderPK() {
     ? 'For booking agencies & press — preview & download'
     : 'Pour agences de booking & presse — prévisualiser & télécharger';
   document.getElementById('pk-ph-lbl').textContent = (lang==='EN'?'Photos':'Photos')+` (${PHOTOS.length})`;
-  document.getElementById('pk-rnd-lbl').textContent = `Random (${RANDOM.length})`;
+  document.getElementById('pk-rnd-lbl').textContent = (lang==='EN'?'Random — paintings':'Random — peintures')+` (${RANDOM.length})`;
   document.getElementById('pk-dlall-t').textContent = lang==='EN' ? 'Download all' : 'Tout télécharger';
   document.getElementById('pk-vid-lbl').textContent = (lang==='EN'?'Videos':'Vidéos')+` (${VIDEOS.length})`;
   document.getElementById('pk-bio-lbl').textContent = (lang==='EN'?'Biography':'Biographie')+` — ${lang}`;
@@ -1001,7 +1093,8 @@ function renderPK() {
   });
   document.getElementById('pk-info').innerHTML = h;
   renderGallery('press');
-  renderGallery('random');
+  renderRandomTeaser();
+  renderRandomPage();
   renderVids();
 }
 
@@ -1034,7 +1127,8 @@ document.addEventListener('keydown', (e) => {
 function dlPvPhoto() { const p=pvItems().find(x=>x.id===pvId); if(p) dlFile(p.src,p.lbl); }
 
 function dlFile(url, name) {
-  const a=document.createElement('a'); a.href=url; a.download='lazizze-'+name+'.jpg';
+  const ext=(url.split('.').pop()||'jpg').toLowerCase();
+  const a=document.createElement('a'); a.href=encodeURI(url); a.download='lazizze-'+name+'.'+ext;
   a.target='_blank'; a.rel='noopener noreferrer'; a.click();
 }
 function dlAll() { PHOTOS.forEach(p=>dlFile(p.src,p.lbl)); }
