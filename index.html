@@ -512,11 +512,15 @@
       border: var(--b); background: var(--bk);
     }
     @media (min-width: 1100px) { .rnd-item { margin-bottom: 2vw; } }
+    /* pendant le chargement : la case prend la couleur dominante de la peinture */
+    .rnd-ph { background: var(--tint, var(--bk)); }
     .rnd-item img {
       width: 100%; height: auto; display: block;
-      transition: opacity 0.2s ease;
+      opacity: 0; transition: opacity 0.5s ease;
     }
-    .rnd-item:hover img { opacity: 0.85; }
+    .rnd-item img.is-in { opacity: 1; }
+    .rnd-item:hover img.is-in { opacity: 0.85; }
+    @media (prefers-reduced-motion: reduce) { .rnd-item img { transition: none; } }
     .rnd-item:focus-visible { outline: 3px solid var(--bk); outline-offset: 3px; }
     .rnd-cap {
       display: flex; justify-content: space-between;
@@ -829,9 +833,11 @@ const RANDOM_SIZES = [[2000,1369],[1393,2000],[1207,2000],[1360,2000],[1441,2000
 // Infomaniak est limité en place. En local, on lit les fichiers du dossier.
 const IS_LOCAL = location.protocol === 'file:' || ['localhost', '127.0.0.1'].includes(location.hostname);
 const RANDOM_DIR = IS_LOCAL ? 'photos/random' : 'https://cdn.jsdelivr.net/gh/Lazizze-git/DJ@main/photos/random';
+// Couleur dominante de chaque peinture, affichée pendant son chargement
+const RANDOM_TINTS = ['#834556','#981821','#596275','#73726e','#9b5c61','#8d645e','#71474f','#a45b6a','#724254','#9b8686','#b06a4b','#91777b','#9a373a','#704a62','#928071','#ab6d77','#997174','#655c79'];
 const RANDOM = RANDOM_SIZES.map(([w, h], i) => {
   const n = String(i + 1).padStart(2, '0');
-  return { id: i + 1, lbl: `Random ${n}`, src: `${RANDOM_DIR}/random-${n}.webp`, thumb: `${RANDOM_DIR}/random-${n}-sm.webp`, w, h };
+  return { id: i + 1, lbl: `Random ${n}`, src: `${RANDOM_DIR}/random-${n}.webp`, thumb: `${RANDOM_DIR}/random-${n}-sm.webp`, tint: RANDOM_TINTS[i], w, h };
 });
 
 const GALLERIES = {
@@ -1028,7 +1034,7 @@ function renderRandomPage() {
     : `Peintures — ${RANDOM.length} œuvres — cliquer pour agrandir`;
   document.getElementById('rnd-grid').innerHTML = RANDOM.map((p, i) =>
     `<figure class="rnd-item" tabindex="0" onclick="openPv('random',${p.id})" onkeydown="if(event.key==='Enter')openPv('random',${p.id})">
-      <img src="${p.thumb}" width="${p.w}" height="${p.h}" alt="${p.lbl}" loading="${i < 3 ? 'eager' : 'lazy'}" decoding="async">
+      <div class="rnd-ph" style="--tint:${p.tint}"><img src="${p.thumb}" width="${p.w}" height="${p.h}" alt="${p.lbl}" loading="${i < 3 ? 'eager' : 'lazy'}" decoding="async" onload="this.classList.add('is-in')" onerror="this.classList.add('is-in')"></div>
       <figcaption class="rnd-cap"><span>${p.lbl}</span><span>${String(i + 1).padStart(2, '0')} / ${RANDOM.length}</span></figcaption>
     </figure>`
   ).join('');
@@ -1112,12 +1118,26 @@ function navPv(d) {
   const idx = cur+d;
   if (idx>=0 && idx<items.length) { pvId=items[idx].id; updPv(); }
 }
+// Affiche tout de suite la vignette (déjà chargée par la grille), puis la remplace par la HD dès qu'elle est prête
+function showPvImage(p) {
+  const img = document.getElementById('pv-img');
+  const full = encodeURI(p.src);
+  if (!p.thumb) { img.src = full; return; }
+  img.src = encodeURI(p.thumb);
+  const gal = pvGal;
+  const hd = new Image();
+  hd.onload = () => { if (pvGal === gal && pvId === p.id) img.src = full; };
+  hd.src = full;
+}
+function preloadFull(p) { if (p) new Image().src = encodeURI(p.src); }
 function updPv() {
   const items = pvItems();
   const idx = items.findIndex(x=>x.id===pvId);
   const p = items[idx];
   if (!p) return;
-  document.getElementById('pv-img').src = encodeURI(p.src);
+  showPvImage(p);
+  preloadFull(items[idx - 1]);
+  preloadFull(items[idx + 1]);
   document.getElementById('pv-lbl').textContent = `${p.lbl} — ${idx+1}/${items.length}`;
   document.getElementById('pv-prev').classList.toggle('off', idx<=0);
   document.getElementById('pv-next').classList.toggle('off', idx===items.length-1);
