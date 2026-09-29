@@ -481,7 +481,7 @@
     /* PRESSKIT — APERÇU RANDOM */
     .pk-rnd {
       display: grid; grid-template-columns: repeat(3, 1fr);
-      border-bottom: var(--b); cursor: pointer; background: var(--bk);
+      border-bottom: var(--b); cursor: pointer; background: var(--pk);
     }
     .pk-rnd-cell { aspect-ratio: 1 / 1; overflow: hidden; border-right: var(--b); }
     .pk-rnd-cell:last-child { border-right: none; }
@@ -489,6 +489,8 @@
       width: 100%; height: 100%; object-fit: cover; display: block;
       transition: transform 0.4s ease;
     }
+    /* voile rose : plus clair que les photos, sinon les peintures rouges virent au noir */
+    .pk-rnd-cell.halftone img { filter: grayscale(100%) contrast(1.2) brightness(1.5); }
     .pk-rnd:hover .pk-rnd-cell img { transform: scale(1.04); }
     .pk-rnd-go { background: var(--bk); }
     .pk-rnd-go span { color: var(--pk); }
@@ -763,7 +765,7 @@
         </div>
       </div>
       <div class="pk-info" id="pk-info"></div>
-      <div class="pk-dl-strip" onclick="dlAll()"><span id="pk-dl-t"></span></div>
+      <div class="pk-dl-strip" onclick="dlPresskit()"><span id="pk-dl-t"></span></div>
     </div>
     <nav class="bottom-nav" data-nav="presskit"></nav>
   </div>
@@ -821,10 +823,8 @@ const TRACKS = [
 const PHOTOS = [
   { id:1, lbl:"Press photo 01", src:"photos/IMG_2686 2.jpg" },
   { id:2, lbl:"Press photo 02", src:"photos/5b837873-e09c-4faf-bed6-292d6bcee1ad 2.JPG" },
-  { id:3, lbl:"Press photo 03", src:"photos/IMG_6912.jpg" },
-  { id:4, lbl:"Press photo 04", src:"photos/58b7b377-a1ee-4f3b-8d25-e8e8dd5ed3d9.jpg" },
-  { id:5, lbl:"Press photo 05", src:"photos/0f47fab6-67ff-44f3-ac5a-c42605e29e4e.JPG" },
-  { id:6, lbl:"Press photo 06", src:"photos/IMG_2122.jpg" },
+  { id:3, lbl:"Press photo 03", src:"photos/58b7b377-a1ee-4f3b-8d25-e8e8dd5ed3d9.jpg" },
+  { id:4, lbl:"Press photo 04", src:"photos/0f47fab6-67ff-44f3-ac5a-c42605e29e4e.JPG" },
 ];
 
 // Peintures : [largeur, hauteur] de la grande version, pour réserver la place avant chargement
@@ -989,9 +989,12 @@ function toggleGallery(key) { GALLERIES[key].open = !GALLERIES[key].open; render
 
 function renderGallery(key) {
   const gal = GALLERIES[key];
-  const ph = gal.open ? gal.items : gal.items.slice(0, 3);
+  // Jusqu'à 4 photos, tout tient sur une ligne : pas besoin de bouton « voir tout »
+  const fitsOneRow = gal.items.length <= 4;
+  const ph = gal.open || fitsOneRow ? gal.items : gal.items.slice(0, 3);
   const grid = document.getElementById(gal.gridId);
-  const cols = Math.min(3, ph.length);
+  const cols = fitsOneRow ? ph.length : Math.min(3, ph.length);
+  document.getElementById(gal.seeId).parentElement.style.display = fitsOneRow ? 'none' : '';
   grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
   let s = '';
   ph.forEach((p, i) => {
@@ -1021,7 +1024,7 @@ function renderGallery(key) {
 
 function renderRandomTeaser() {
   document.getElementById('pk-random').innerHTML = RANDOM.slice(0, 3).map(p =>
-    `<div class="pk-rnd-cell"><img src="${p.thumb}" alt="${p.lbl}" loading="lazy"></div>`
+    `<div class="pk-rnd-cell halftone"><img src="${p.thumb}" alt="${p.lbl}" loading="lazy"></div>`
   ).join('');
   document.getElementById('pk-see-random').textContent = lang==='EN'
     ? `→ See the ${RANDOM.length} paintings`
@@ -1155,7 +1158,47 @@ function dlFile(url, name) {
   const a=document.createElement('a'); a.href=encodeURI(url); a.download='lazizze-'+name+'.'+ext;
   a.target='_blank'; a.rel='noopener noreferrer'; a.click();
 }
-function dlAll() { PHOTOS.forEach(p=>dlFile(p.src,p.lbl)); }
+// Export en un seul fichier ZIP (le module zip.js n'est chargé qu'au clic)
+async function fetchBytes(url) {
+  const res = await fetch(encodeURI(url));
+  if (!res.ok) throw new Error(`${res.status} ${url}`);
+  return new Uint8Array(await res.arrayBuffer());
+}
+function pressPhotoFiles() {
+  return PHOTOS.map((p, i) => ({ url: p.src, name: `photos/lazizze-press-${String(i + 1).padStart(2, '0')}.${p.src.split('.').pop().toLowerCase()}` }));
+}
+function paintingFiles() {
+  return RANDOM.map(p => ({ url: p.src, name: `paintings/lazizze-${p.lbl.toLowerCase().replace(' ', '-')}.webp` }));
+}
+async function downloadZip(zipName, remoteFiles, textFiles, labelEl) {
+  if (labelEl.dataset.busy) return;
+  const original = labelEl.textContent;
+  labelEl.dataset.busy = '1';
+  labelEl.textContent = lang==='EN' ? 'Preparing…' : 'Préparation…';
+  try {
+    const { makeZip } = await import('./zip.js');
+    const encoder = new TextEncoder();
+    const fetched = await Promise.all(remoteFiles.map(async f => ({ name: `lazizze-presskit/${f.name}`, data: await fetchBytes(f.url) })));
+    const texts = textFiles.map(f => ({ name: `lazizze-presskit/${f.name}`, data: encoder.encode(f.text) }));
+    const url = URL.createObjectURL(makeZip([...texts, ...fetched]));
+    const a = document.createElement('a'); a.href = url; a.download = zipName; a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 10000);
+    labelEl.textContent = original;
+  } catch (err) {
+    labelEl.textContent = lang==='EN' ? 'Download failed — try again' : 'Échec du téléchargement — réessayer';
+    setTimeout(() => { labelEl.textContent = original; }, 4000);
+    reportError(err);
+  } finally {
+    delete labelEl.dataset.busy;
+  }
+}
+function dlAll() {
+  downloadZip('lazizze-photos.zip', pressPhotoFiles(), [], document.getElementById('pk-dlall-t'));
+}
+function dlPresskit() {
+  const bios = [{ name: 'bio-en.txt', text: BIO.EN }, { name: 'bio-fr.txt', text: BIO.FR }];
+  downloadZip('lazizze-presskit.zip', [...pressPhotoFiles(), ...paintingFiles()], bios, document.getElementById('pk-dl-t'));
+}
 function dlBio() {
   const b=new Blob([BIO[lang]],{type:'text/plain'}), u=URL.createObjectURL(b);
   const a=document.createElement('a'); a.href=u; a.download=`lazizze-bio-${lang.toLowerCase()}.txt`; a.click();
